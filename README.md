@@ -4,12 +4,14 @@ Project for centralizing Geminis architecture backend, as well as LiveOps to sup
 
 This project aims to swarm the following services:
 
+* Websocket server
+* HTTP Server LiveOps
 * Docker Registry
 * Portainer
-* Netdata
+* Prometheus
+* Grafana
 * NGINX
 * NGINX Amplify
-* C++ Websocket
 * PostgreSQL
 * PGAdmin4
 * Redis
@@ -22,6 +24,6 @@ This project aims to swarm the following services:
 `sudo openssl req -x509 -nodes -days 365 -newkey rsa:2048 -keyout ./certs/domain.key -out ./certs/domain.crt`
 `sudo openssl dhparam -out ./certs/dhparam.pem 2048`
 
-##
+## Auth
 `auth/htpasswd`
 `user password`
