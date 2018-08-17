@@ -1,0 +1,35 @@
+version: "3.7"
+
+services:
+  nginx:
+    image: nginx:alpine
+    ports:
+      - 80:80
+      - 443:443
+    deploy:
+      mode: replicated
+      replicas: 1
+      placement:
+        constraints: [node.role == manager]
+    depends_on:
+      - prometheus
+      - pgadmin
+    networks:
+      - gema
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./services:/etc/nginx/conf.d:ro
+      - ./auth:/auth
+      - ./certs:/certs
+      - nginx_static:/usr/share/nginx/html
+      - nginx_sockets:/sockets
+
+  # nginx-amplify:
+
+networks:
+  gema:
+    external: true
+
+volumes:
+  nginx_static:
+  nginx_sockets:

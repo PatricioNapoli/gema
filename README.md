@@ -26,4 +26,26 @@ This project aims to swarm the following services:
 
 ## Auth
 `auth/htpasswd`
+Format:
 `user password`
+
+`auth/nginxpasswd`
+Use htpasswd online generator
+
+
+## Env vars
+Setup preset.env into .env.
+
+## Localhost resolution
+Add to /etc/hosts:
+
+127.0.0.1 portainer.localhost
+127.0.0.1 pgadmin.localhost
+127.0.0.1 registry.localhost
+127.0.0.1 prometheus.localhost
+127.0.0.1 grafana.localhost
+127.0.0.1 kibana.localhost
+
+docker stack deploy --compose-file=portainer-compose.yml portainer
+docker stack deploy --compose-file=architecture-compose.yml architecture
+docker stack deploy --compose-file=nginx-compose.yml nginx
