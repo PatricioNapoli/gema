@@ -67,8 +67,6 @@ services:
   metricbeat:
     user: root
     image: docker.elastic.co/beats/metricbeat:6.3.2
-    env_file:
-      - ./.env
     volumes:
       - /proc:/hostfs/proc:ro
       - /sys/fs/cgroup:/hostfs/sys/fs/cgroup:ro
@@ -86,10 +84,27 @@ services:
         window: 120s
     command: ["--strict.perms=false", "-system.hostfs=/hostfs"]
 
+  filebeat:
+    image: docker.elastic.co/beats/filebeat:6.2.2
+    volumes:
+      - nginx_logs:/var/log/nginx
+      - ./filebeat.yml:/usr/share/filebeat/filebeat.yml
+    networks:
+      - gema
+    deploy:
+      mode: global
+      restart_policy:
+        condition: on-failure
+        delay: 5s
+        max_attempts: 3
+        window: 120s
+
   postgres:
     image: postgres:alpine
     env_file:
       - ./.env
+    environment:
+      POSTGRES_USER: geminis
     deploy:
       mode: replicated
       replicas: 1
@@ -109,6 +124,9 @@ services:
     image: dpage/pgadmin4
     env_file:
       - ./.env
+    environment:
+      PGADMIN_DEFAULT_EMAIL: admin@geminis.io
+      PGADMIN_ENABLE_TLS: "True"
     deploy:
       mode: replicated
       replicas: 1
@@ -150,6 +168,7 @@ networks:
 
 volumes:
   elasticsearch_data:
+  nginx_logs:
   kibana_data:
   pgadmin_data:
   postgres_data:
