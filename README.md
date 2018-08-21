@@ -76,6 +76,10 @@ Setup sysctl map count if needed. (see node-init.sh)
 * Sentry Docker
 * OwnCloud Docker
 * Filebeat Syslog
+* Define /health for services, (HEALTHCHECK dockerfile) GEMA Dashboard should test those for health.
+* Define /metrics for services?
+* Define logstash log pattern for all services in GEMA for parsing.
+* Use wikis for documentation?
 
 ---
 
