@@ -1,4 +1,4 @@
-# Geminis Architecture
+# GEMA - Geminis Architecture
 
 Project for centralizing Geminis architecture backend, as well as LiveOps to support the everquest of integrating new applications into our baseline.
 
@@ -47,7 +47,8 @@ Add to /etc/hosts:
 127.0.0.1 registry.localhost
 127.0.0.1 kibana.localhost
 
-TODO: 
+## TODO
+
 * Use unix sockets for DB 
 * Internal proxy auth 
 * Internal proxy discovery agent, options: https, port, websocket support, require auth, domain
