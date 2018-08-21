@@ -60,7 +60,7 @@ Setup sysctl map count if needed. (see node-init.sh)
 
 * Use unix sockets for DB 
 * Internal proxy auth 
-* Internal proxy discovery agent, options: https, port, websocket support, require auth, domain
+* Internal proxy discovery agent, options: https, port, websocket support, require auth, domain, max body size.
 * Cluster redis and postgres for data redundancy
 * Investigate Swarm behaviour when deploying NGINX proxy, always use exposed master node.
 * Stg environment considerations 
