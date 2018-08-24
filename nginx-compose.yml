@@ -15,23 +15,23 @@ services:
         max_attempts: 3
         window: 120s
       placement:
-        constraints: [node.role == manager]
+        constraints: [node.labels.category == main]
     networks:
-      - architecture_gema
+      - gema_gema
     volumes:
       - ./nginx.conf:/etc/nginx/nginx.conf:ro
       - ./auth:/auth
       - ./certs:/certs
-      - architecture_nginx_logs:/var/log/nginx/
+      - gema_nginx_logs:/var/log/nginx/
       - nginx_static:/usr/share/nginx/html
       - nginx_sockets:/sockets
 
 networks:
-  architecture_gema:
+  gema_gema:
     external: true
 
 volumes:
   nginx_static:
   nginx_sockets:
-  architecture_nginx_logs:
+  gema_nginx_logs:
     external: true

@@ -64,7 +64,7 @@ metricbeat.modules:
     #- raid           # Raid
     - socket         # Sockets and connection info (linux only)
   enabled: true
-  period: 10s
+  period: 1m
   processes: ['.*']
 
   # Configure the metric types that are included by these metricsets.
@@ -122,22 +122,22 @@ metricbeat.modules:
   #diskio.include_devices: []
 
 #------------------------------- Docker Module -------------------------------
-- module: docker
-  metricsets:
-    - "container"
-    - "cpu"
-    - "diskio"
-    - "healthcheck"
-    - "info"
-    #- "image"
-    - "memory"
-    - "network"
-  hosts: ["unix:///var/run/docker.sock"]
-  period: 10s
-  enabled: true
+# - module: docker
+#   metricsets:
+#     - "container"
+#     - "cpu"
+#     - "diskio"
+#     - "healthcheck"
+#     - "info"
+#     #- "image"
+#     - "memory"
+#     - "network"
+#   hosts: ["unix:///var/run/docker.sock"]
+#   period: 1m
+#   enabled: true
 
   # Replace dots in labels with `_`. Set to false to keep dots
-  labels.dedot: true
+  # labels.dedot: true
 
   # To connect to Docker over TLS you must specify a client and CA certificate.
   #ssl:
@@ -146,10 +146,10 @@ metricbeat.modules:
     #key:                   "/etc/pki/client/cert.key"
 
 #---------------------------- Elasticsearch Module ---------------------------
-- module: elasticsearch
-  metricsets: ["node", "node_stats"]
-  period: 10s
-  hosts: ["elasticsearch:9200"]
+# - module: elasticsearch
+#   metricsets: ["node", "node_stats"]
+#   period: 1m
+#   hosts: ["elasticsearch:9200"]
 
 #------------------------------- Golang Module -------------------------------
 # - module: golang
@@ -163,11 +163,11 @@ metricbeat.modules:
 
 
 #------------------------------- Kibana Module -------------------------------
-- module: kibana
-  metricsets: ["status"]
-  period: 10s
-  hosts: ["kibana:5601"]
-  enabled: true
+# - module: kibana
+#   metricsets: ["status"]
+#   period: 1m
+#   hosts: ["kibana:5601"]
+#   enabled: true
 
 #------------------------------ Logstash Module ------------------------------
 # - module: logstash
@@ -180,7 +180,7 @@ metricbeat.modules:
 - module: nginx
   metricsets: ["stubstatus"]
   enabled: true
-  period: 10s
+  period: 1m
 
   # Nginx hosts
   hosts: ["http://nginx"]
@@ -201,7 +201,7 @@ metricbeat.modules:
     # Stats about every PostgreSQL process
     - activity
 
-  period: 10s
+  period: 1m
 
   # The host must be passed as PostgreSQL URL. Example:
   # postgres://localhost:5432?sslmode=disable
@@ -219,7 +219,7 @@ metricbeat.modules:
 - module: redis
   metricsets: ["info", "keyspace"]
   enabled: true
-  period: 10s
+  period: 1m
 
   # Redis hosts
   hosts: ["redis:6379"]

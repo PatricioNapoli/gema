@@ -18,6 +18,10 @@ Using the following environment:
 * PostgreSQL
 * PGAdmin4
 * Redis
+* Memcached
+* NextCloud
+* Sentry
+* Exim SMTP
 * Elasticsearch
 * Logstash
 * Kibana
@@ -28,7 +32,7 @@ Using the following environment:
 `sudo openssl req -x509 -nodes -days 365 -newkey rsa:2048 -keyout ./certs/domain.key -out ./certs/domain.crt`  
 `sudo openssl dhparam -out ./certs/dhparam.pem 2048`
 
-## Auth (deprecated)
+## Auth for Registry
 `auth/htpasswd`  
 Use htpasswd online generator, bcrypt algorithm.
 
@@ -47,35 +51,37 @@ Add to /etc/hosts:
 127.0.0.1 pgadmin.localhost
 127.0.0.1 registry.localhost
 127.0.0.1 kibana.localhost
+127.0.0.1 cloud.localhost
 ```
 
 ## Running
 
 Setup sysctl map count if needed. (see node-init.sh)  
+Setup main node label.  
+
+`docker node update --label-add category=main <HOSTNAME>`  
+
+Afterwards:  
 
 `docker swarm init`  
 `./deploy.sh`  
 
 ## TODO
 
-* Use unix sockets for DB 
-* Internal proxy auth 
+* Internal proxy auth, create dashboard for creating users. These users work for the HQ and the internal services, limit access to kibana.
 * Internal proxy discovery agent, options: https, port, websocket support, require auth, domain, max body size.
-* Cluster redis and postgres for data redundancy
-* Investigate Swarm behaviour when deploying NGINX proxy, always use exposed master node.
-* Stg environment considerations 
+* Cluster redis and postgres for data redundancy?
+* Stg environment considerations? Just use another cluster with adjusted DNS wildcard.
 * GEMA dashboard, hq.geminis.io, live ops, reports generation, ML, message broadcast through WS, push notifications, service routings, let client have a user
 * Use swarm secrets
 * Use swarm configs
 * Unit test GEMA
 * Tweak bash for deployment
 * Investigate service updating, (dynamic configs?)
-* Setup Gitlab yml CI/CD
+* Setup Gitlab yml CI/CD, Trigger SonarQube with Gitlab Push
 * Go Expvar
 * Go APM
 * Sentry Docker
-* OwnCloud Docker
-* Filebeat Syslog
 * Define /health for services, (HEALTHCHECK dockerfile) GEMA Dashboard should test those for health.
 * Define /metrics for services?
 * Define logstash log pattern for all services in GEMA for parsing.

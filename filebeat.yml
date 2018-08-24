@@ -12,14 +12,14 @@
 filebeat.modules:
 
 #------------------------------- System Module -------------------------------
-#- module: system
+- module: system
   # Syslog
-  #syslog:
-    #enabled: true
+  syslog:
+    enabled: true
 
     # Set custom paths for the log files. If left empty,
     # Filebeat will choose the paths depending on your OS.
-    #var.paths:
+    # var.paths:
 
     # Convert the timestamp to UTC. Requires Elasticsearch >= 6.1.
     #var.convert_timezone: false
@@ -29,8 +29,8 @@ filebeat.modules:
     #input:
 
   # Authorization logs
-  #auth:
-    #enabled: true
+  auth:
+    enabled: true
 
     # Set custom paths for the log files. If left empty,
     # Filebeat will choose the paths depending on your OS.

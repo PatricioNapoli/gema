@@ -14,8 +14,6 @@ services:
     deploy:
       mode: replicated
       replicas: 1
-      placement:
-        constraints: [node.role == manager]
       restart_policy:
         condition: on-failure
         delay: 5s
@@ -57,8 +55,6 @@ services:
         delay: 5s
         max_attempts: 3
         window: 120s
-      placement:
-        constraints: [node.role == manager]
     networks:
       - gema
     volumes:
@@ -75,6 +71,8 @@ services:
       - ./metricbeat.yml:/usr/share/metricbeat/metricbeat.yml
     networks:
       - gema
+    env_file:
+      - ./.env
     deploy:
       mode: global
       restart_policy:
@@ -89,6 +87,8 @@ services:
     volumes:
       - nginx_logs:/var/log/nginx
       - ./filebeat.yml:/usr/share/filebeat/filebeat.yml
+      - /var/log/auth.log:/var/log/auth.log
+      - /var/log/syslog:/var/log/syslog
     networks:
       - gema
     deploy:
@@ -103,8 +103,6 @@ services:
     image: postgres:alpine
     env_file:
       - ./.env
-    environment:
-      POSTGRES_USER: geminis
     deploy:
       mode: replicated
       replicas: 1
@@ -113,8 +111,6 @@ services:
         delay: 5s
         max_attempts: 3
         window: 120s
-      placement:
-        constraints: [node.role == manager]
     networks:
       - gema
     volumes:
@@ -135,8 +131,6 @@ services:
         delay: 5s
         max_attempts: 3
         window: 120s
-      placement:
-        constraints: [node.role == manager]
     networks:
       - gema
     volumes:
@@ -154,12 +148,56 @@ services:
         delay: 5s
         max_attempts: 3
         window: 120s
-      placement:
-        constraints: [node.role == manager]
     networks:
       - gema
     volumes:
       - redis_data:/data
+
+  nextcloud:
+    image: nextcloud:apache
+    deploy:
+      mode: replicated
+      replicas: 1
+      restart_policy:
+        condition: on-failure
+        delay: 5s
+        max_attempts: 3
+        window: 120s
+    volumes:
+      - nextcloud_data:/var/www/html
+    networks:
+      - gema
+    environment:
+      POSTGRES_HOST: postgres
+      NEXTCLOUD_TABLE_PREFIX: nc_
+    env_file:
+      - .env
+
+  exim:
+    image: tianon/exim4
+    deploy:
+      mode: replicated
+      replicas: 1
+      restart_policy:
+        condition: on-failure
+        delay: 5s
+        max_attempts: 3
+        window: 120s
+    networks:
+      - gema
+
+  memcached:
+    image: memcached:alpine
+    deploy:
+      mode: replicated
+      replicas: 1
+      restart_policy:
+        condition: on-failure
+        delay: 5s
+        max_attempts: 3
+        window: 120s
+    networks:
+      - gema
 
 networks:
   gema:
@@ -173,3 +211,4 @@ volumes:
   pgadmin_data:
   postgres_data:
   redis_data:
+  nextcloud_data:
