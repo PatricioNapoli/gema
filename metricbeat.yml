@@ -48,28 +48,28 @@ metricbeat.max_start_delay: 10s
 metricbeat.modules:
 
 #------------------------------- System Module -------------------------------
-- module: system
-  metricsets:
-    - cpu             # CPU usage
-    - filesystem      # File system usage for each mountpoint
-    - fsstat          # File system summary metrics
-    - load            # CPU load averages
-    - memory          # Memory usage
-    - network         # Network IO
-    - process         # Per process metrics
-    - process_summary # Process summary
-    - uptime          # System Uptime
-    - core           # Per CPU core usage
-    - diskio         # Disk IO
-    #- raid           # Raid
-    - socket         # Sockets and connection info (linux only)
-  enabled: true
-  period: 1m
-  processes: ['.*']
+# - module: system
+#   metricsets:
+#     - cpu             # CPU usage
+#     - filesystem      # File system usage for each mountpoint
+#     - fsstat          # File system summary metrics
+#     - load            # CPU load averages
+#     - memory          # Memory usage
+#     - network         # Network IO
+#     - process         # Per process metrics
+#     - process_summary # Process summary
+#     - uptime          # System Uptime
+#     - core           # Per CPU core usage
+#     - diskio         # Disk IO
+#     #- raid           # Raid
+#     - socket         # Sockets and connection info (linux only)
+#   enabled: true
+#   period: 30s
+#   processes: ['.*']
 
   # Configure the metric types that are included by these metricsets.
-  cpu.metrics:  ["percentages"]  # The other available options are normalized_percentages and ticks.
-  core.metrics: ["percentages"]  # The other available option is ticks.
+  # cpu.metrics:  ["percentages"]  # The other available options are normalized_percentages and ticks.
+  # core.metrics: ["percentages"]  # The other available option is ticks.
 
   # A list of filesystem types to ignore. The filesystem metricset will not
   # collect data from filesystems matching any of the specified types, and
@@ -133,7 +133,7 @@ metricbeat.modules:
 #     - "memory"
 #     - "network"
 #   hosts: ["unix:///var/run/docker.sock"]
-#   period: 1m
+#   period: 30s
 #   enabled: true
 
   # Replace dots in labels with `_`. Set to false to keep dots
@@ -180,7 +180,7 @@ metricbeat.modules:
 - module: nginx
   metricsets: ["stubstatus"]
   enabled: true
-  period: 1m
+  period: 30s
 
   # Nginx hosts
   hosts: ["http://nginx"]
@@ -201,7 +201,7 @@ metricbeat.modules:
     # Stats about every PostgreSQL process
     - activity
 
-  period: 1m
+  period: 30s
 
   # The host must be passed as PostgreSQL URL. Example:
   # postgres://localhost:5432?sslmode=disable
@@ -219,7 +219,7 @@ metricbeat.modules:
 - module: redis
   metricsets: ["info", "keyspace"]
   enabled: true
-  period: 1m
+  period: 30s
 
   # Redis hosts
   hosts: ["redis:6379"]
@@ -246,6 +246,12 @@ metricbeat.modules:
 
   # Redis AUTH password. Empty by default.
   #password: foobared
+
+- module: memcached
+  metricsets: ["stats"]
+  period: 10s
+  hosts: ["memcached:11211"]
+  enabled: true
 
 
 #================================ General ======================================

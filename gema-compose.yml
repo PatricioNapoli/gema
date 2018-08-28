@@ -1,6 +1,48 @@
 version: "3.7"
 
 services:
+  prometheus:
+    image: prom/prometheus
+    deploy:
+      mode: replicated
+      replicas: 1
+      restart_policy:
+        condition: on-failure
+        delay: 5s
+        max_attempts: 3
+        window: 120s
+    networks:
+      - gema
+    volumes:
+      - ./prometheus.yml:/etc/prometheus/prometheus.yml
+
+  exporter:
+    image: prom/node-exporter
+    deploy:
+      mode: global
+      restart_policy:
+        condition: on-failure
+        delay: 5s
+        max_attempts: 3
+        window: 120s
+    networks:
+        - gema
+
+  grafana:
+    image: grafana/grafana
+    deploy:
+      mode: replicated
+      replicas: 1
+      restart_policy:
+        condition: on-failure
+        delay: 5s
+        max_attempts: 3
+        window: 120s
+    networks:
+      - gema
+    volumes:
+      - grafana_data:/var/lib/grafana
+
   elasticsearch:
     image: docker.elastic.co/elasticsearch/elasticsearch:6.3.2
     hostname: "elasticsearch"
@@ -61,13 +103,8 @@ services:
       - kibana_data:/usr/share/kibana/data
 
   metricbeat:
-    user: root
     image: docker.elastic.co/beats/metricbeat:6.3.2
     volumes:
-      - /proc:/hostfs/proc:ro
-      - /sys/fs/cgroup:/hostfs/sys/fs/cgroup:ro
-      - /:/hostfs:ro
-      - /var/run/docker.sock:/var/run/docker.sock
       - ./metricbeat.yml:/usr/share/metricbeat/metricbeat.yml
     networks:
       - gema
@@ -80,7 +117,6 @@ services:
         delay: 5s
         max_attempts: 3
         window: 120s
-    command: ["--strict.perms=false", "-system.hostfs=/hostfs"]
 
   filebeat:
     image: docker.elastic.co/beats/filebeat:6.2.2
@@ -205,6 +241,7 @@ networks:
     attachable: true
 
 volumes:
+  grafana_data:
   elasticsearch_data:
   nginx_logs:
   kibana_data:

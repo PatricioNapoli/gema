@@ -52,6 +52,7 @@ Add to /etc/hosts:
 127.0.0.1 registry.localhost
 127.0.0.1 kibana.localhost
 127.0.0.1 cloud.localhost
+127.0.0.1 grafana.localhost
 ```
 
 ## Running
