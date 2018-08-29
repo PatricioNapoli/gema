@@ -4,7 +4,7 @@ WORKDIR /go/src/gema/server
 
 VOLUME /go/src/gema/server
 VOLUME /go/bin/static
-VOLUME /go/bin/views
+VOLUME /go/bin/templates
 
 RUN apk add git
 
@@ -14,6 +14,6 @@ RUN ./deps.sh
 COPY . .
 
 COPY static /go/bin/static
-COPY views /go/bin/views
+COPY templates /go/bin/templates
 
 ENTRYPOINT ["./entrypoint.sh"]

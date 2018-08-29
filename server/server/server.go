@@ -13,12 +13,15 @@ import (
 )
 
 type Server struct {
+	App *iris.Application
 	Redis *redis.Database
 	Postgres *pg.DB
 	Session *sessions.Sessions
 }
 
 func New(app *iris.Application) *Server {
+	app.Logger().Info("Initializing cache and main databases.")
+
 	r := redis.New(service.Config{
 		Network:     "tcp",
 		Addr:        "redis:6379",
@@ -29,12 +32,12 @@ func New(app *iris.Application) *Server {
 
 	p := pg.Connect(&pg.Options{
 		Addr: "postgres:5432",
-		User: "gema",
+		User: os.Getenv("POSTGRES_USER"),
 		Password: os.Getenv("POSTGRES_PASSWORD"),
-		Database: "gema",
+		Database: os.Getenv("POSTGRES_USER"),
 	})
 
-	createSchema(p)
+	migrate(p)
 
 	s := sessions.New(sessions.Config{
 		Cookie:       "sessionscookieid",
@@ -44,11 +47,22 @@ func New(app *iris.Application) *Server {
 
 	s.UseDatabase(r)
 
+	app.Logger().Info("Databases initialized.")
+
 	return &Server{
+		App: app,
 		Redis: r,
 		Postgres : p,
 		Session: s,
 	}
+}
+
+func (s *Server) IsFirstLogin() bool {
+	count, err := s.Postgres.Model((*models.User)(nil)).Count()
+	if err != nil {
+		panic(err)
+	}
+	return count == 0
 }
 
 func (s Server) Dispose() {
@@ -56,10 +70,10 @@ func (s Server) Dispose() {
 	s.Postgres.Close()
 }
 
-func createSchema(db *pg.DB) error {
+func migrate(db *pg.DB) error {
 	for _, model := range []interface{}{(*models.User)(nil)} {
 		err := db.CreateTable(model, &orm.CreateTableOptions{
-
+			IfNotExists: true,
 		})
 		if err != nil {
 			return err

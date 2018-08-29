@@ -11,16 +11,16 @@ body {
     min-height: 100vh;
     flex-direction: column;
 
-    background: #a90329;
-    background: -moz-linear-gradient(top, #a90329 0%, #8f0222 44%, #6d0019 100%);
-    background: -webkit-linear-gradient(top, #a90329 0%,#8f0222 44%,#6d0019 100%);
-    /*background: linear-gradient(to bottom, #a90329 0%,#8f0222 44%,#6d0019 100%);*/
-    background-image: url("../images/city.png");
-    background-size: 2160px;
+    background: rgb(218,0,112);
+    background: linear-gradient(0deg, rgba(218,0,112,1) 0%, rgba(166,0,85,1) 25%, rgba(129,0,66,1) 50%, rgba(83,0,42,1) 75%, rgba(33,0,17,1) 100%);
 }
 
 a {
     color: white !important;
+}
+
+.underline {
+    border-bottom: 1px solid currentColor;
 }
 
 .content {
@@ -67,10 +67,13 @@ a {
 }
 
 .btn-login {
-    width: 100px;
+    margin-top: 20px;
+
+    width: 150px;
     color: white;
-    background-color: #a90329;
-    border-radius: 60px !important;
+    background: transparent;
+    border: 1px solid white;
+    border-radius: 16px !important;
 
     -o-transition:.5s;
     -ms-transition:.5s;
@@ -81,5 +84,10 @@ a {
 
 .btn-login:hover {
     cursor: pointer;
-    background-color: #c1002b;
+    border-color: #53002A;
+    background-color: #53002A;
+}
+
+.login-container, footer {
+    z-index: 10;
 }

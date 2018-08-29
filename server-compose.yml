@@ -1,0 +1,31 @@
+version: "3.7"
+
+services:
+  server:
+    image: registry.localhost/gema/server
+    ports:
+      - 8080:8080
+    env_file:
+      - ./.env
+    deploy:
+      mode: global
+      restart_policy:
+        condition: on-failure
+        delay: 5s
+        max_attempts: 3
+        window: 120s
+    healthcheck:
+      test: wget --quiet --tries=1 --spider 127.0.0.1:8080/gema/health || exit 1
+      interval: 5s
+      timeout: 10s
+      retries: 3
+    networks:
+        - gema_gema
+    volumes:
+      - ./server/templates:/go/bin/templates
+      - ./server/static:/go/bin/static
+      - ./server:/go/src/gema/server
+
+networks:
+  gema_gema:
+    external: true
