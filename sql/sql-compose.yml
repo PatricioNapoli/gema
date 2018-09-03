@@ -24,7 +24,7 @@ services:
       - ../.env
     environment:
       PGADMIN_DEFAULT_EMAIL: admin@geminis.io
-      PGADMIN_DEFAULT_EMAIL: $POSTGRES_PASSWORD
+      PGADMIN_DEFAULT_PASSWORD: $POSTGRES_PASSWORD
       PGADMIN_ENABLE_TLS: "True"
     deploy:
       mode: replicated
