@@ -20,11 +20,11 @@ services:
       timeout: 10s
       retries: 3
     networks:
-        - gema_gema
+        - gema
     volumes:
-      - ./server/templates:/go/bin/templates
-      - ./server/static:/go/bin/static
-      - ./server:/go/src/gema/server
+      - ./templates:/go/bin/templates
+      - ./static:/go/bin/static
+      - ./:/go/src/gema/server
 
 networks:
   gema_gema:

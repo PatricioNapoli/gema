@@ -1,0 +1,53 @@
+version: "3.7"
+
+services:
+  prometheus:
+    image: prom/prometheus
+    deploy:
+      mode: replicated
+      replicas: 1
+      restart_policy:
+        condition: on-failure
+        delay: 5s
+        max_attempts: 3
+        window: 120s
+    networks:
+      - gema
+    volumes:
+      - prometheus_data:/prometheus
+      - ./prometheus.yml:/etc/prometheus/prometheus.yml
+
+  exporter:
+    image: prom/node-exporter
+    deploy:
+      mode: global
+      restart_policy:
+        condition: on-failure
+        delay: 5s
+        max_attempts: 3
+        window: 120s
+    networks:
+        - gema
+
+  grafana:
+    image: grafana/grafana
+    deploy:
+      mode: replicated
+      replicas: 1
+      restart_policy:
+        condition: on-failure
+        delay: 5s
+        max_attempts: 3
+        window: 120s
+    networks:
+      - gema
+    volumes:
+      - grafana_data:/var/lib/grafana
+
+networks:
+  gema:
+    external: true
+
+volumes:
+  prometheus_data:
+  grafana_data:

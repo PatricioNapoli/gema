@@ -1,0 +1,22 @@
+version: "3.7"
+
+services:
+  logstash:
+    image: docker.elastic.co/logstash/logstash:6.3.2
+    deploy:
+      mode: global
+      restart_policy:
+        condition: on-failure
+        delay: 5s
+        max_attempts: 3
+        window: 120s
+    ports:
+      - "12201:12201/udp"
+    networks:
+      - gema
+    volumes:
+      - ./logstash.conf:/usr/share/logstash/pipeline/logstash.conf
+
+networks:
+  gema:
+    external: true

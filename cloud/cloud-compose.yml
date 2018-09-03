@@ -1,0 +1,29 @@
+version: "3.7"
+
+services:
+  nextcloud:
+    image: nextcloud:apache
+    environment:
+      POSTGRES_HOST: postgres
+      POSTGRES_DB: gema_nc
+    env_file:
+      - ../.env
+    deploy:
+      mode: replicated
+      replicas: 1
+      restart_policy:
+        condition: on-failure
+        delay: 5s
+        max_attempts: 3
+        window: 120s
+    volumes:
+      - data:/var/www/html
+    networks:
+      - gema
+
+networks:
+  gema:
+    external: true
+
+volumes:
+  data:

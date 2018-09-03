@@ -1,0 +1,48 @@
+version: "3.7"
+
+services:
+  postgres:
+    image: postgres:alpine
+    env_file:
+      - ../.env
+    deploy:
+      mode: replicated
+      replicas: 1
+      restart_policy:
+        condition: on-failure
+        delay: 5s
+        max_attempts: 3
+        window: 120s
+    networks:
+      - gema
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+  pgadmin:
+    image: dpage/pgadmin4
+    environment:
+      PGADMIN_DEFAULT_EMAIL: admin@geminis.io
+      PGADMIN_DEFAULT_EMAIL: $POSTGRES_PASSWORD
+      PGADMIN_ENABLE_TLS: "True"
+    deploy:
+      mode: replicated
+      replicas: 1
+      restart_policy:
+        condition: on-failure
+        delay: 5s
+        max_attempts: 3
+        window: 120s
+    networks:
+      - gema
+    volumes:
+      - pgadmin_data:/var/lib/pgadmin
+      - ../certs/domain.crt:/certs/server.cert
+      - ../certs/domain.key:/certs/server.key
+
+networks:
+  gema:
+    external: true
+
+volumes:
+  postgres_data:
+  pgadmin_data:

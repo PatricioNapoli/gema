@@ -6,8 +6,10 @@ import (
 	"gema/server/views"
 	"gema/server/security"
 	"gema/server/models"
-	"github.com/kataras/iris/middleware/recover"
 	"github.com/kataras/iris/middleware/logger"
+	ravenIris "github.com/iris-contrib/middleware/raven"
+	"regexp"
+	"github.com/getsentry/raven-go"
 )
 
 type Health struct {
@@ -17,11 +19,11 @@ type Health struct {
 var gema *server.Server
 
 func main() {
-	app := iris.Default()
+	raven.SetDSN("http://282f7b8847c743849c11096109db5615:8fa28ff9e3a349f78d141a6a3290179a@sentry:9000/1")
 
-	app.Logger().Info("Starting GEMA on 8080.")
+	app := iris.New()
 
-	app.Use(recover.New())
+	app.Use(ravenIris.RecoveryHandler)
 
 	l := logger.New(logger.Config{
 		Status:   true,
@@ -31,11 +33,7 @@ func main() {
 		Query:    false,
 		Columns:  false,
 		LogFunc:  nil,
-		Skippers: []logger.SkipperFunc{
-			func(ctx iris.Context) bool {
-				return ctx.Path() == "/gema/health"
-			},
-		},
+		Skippers: []logger.SkipperFunc{logSkipper},
 	})
 
 	app.Use(l)
@@ -47,21 +45,34 @@ func main() {
 	})
 
 	app.RegisterView(iris.HTML("./templates/landing", ".html").Layout("layout.html"))
-
 	app.StaticWeb("/static", "./static")
 
-	app.Get("/gema/health", healthHandler)
-
-	app.Post("/gema/login", loginPostHandler)
-
-	app.Get("/gema/setup", setupGetHandler)
-	app.Post("/gema/setup", setupPostHandler)
+	gemaRoute := app.Party("/gema")
+	gemaRoute.Get("/health", healthHandler)
+	gemaRoute.Post("/login", loginPostHandler)
+	gemaRoute.Get("/setup", setupGetHandler)
+	gemaRoute.Post("/setup", setupPostHandler)
 
 	app.Handle("ALL", "*", proxyHandler)
 
+	app.Logger().Info("Starting GEMA server.")
 	app.Run(iris.Addr(":8080"), iris.WithConfiguration(iris.Configuration{
 		DisableStartupLog: true,
 	}))
+}
+
+func logSkipper(ctx iris.Context) bool {
+	if ctx.Path() == "/gema/health" {
+		return true
+	}
+
+	matched, err := regexp.MatchString(`.+\..{2,5}$`, ctx.Path())
+
+	if err != nil {
+		panic(err)
+	}
+
+	return matched
 }
 
 func healthHandler(ctx iris.Context) {
@@ -96,6 +107,12 @@ func loginPostHandler(ctx iris.Context) {
 }
 
 func setupGetHandler(ctx iris.Context) {
+	panic("shit")
+
+	if !gema.IsFirstLogin() {
+		ctx.Redirect("/gema/login")
+	}
+
 	ctx.Application().Logger().Info("Setting up admin account.")
 	views.SetupPage(ctx)
 }

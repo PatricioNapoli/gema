@@ -21,7 +21,6 @@ Using the following environment:
 * Memcached
 * NextCloud
 * Sentry
-* Exim SMTP
 * Elasticsearch
 * Logstash
 * Kibana

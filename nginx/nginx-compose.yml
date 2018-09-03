@@ -17,21 +17,20 @@ services:
       placement:
         constraints: [node.labels.category == main]
     networks:
-      - gema_gema
+      - gema
     volumes:
       - ./nginx.conf:/etc/nginx/nginx.conf:ro
-      - ./auth:/auth
-      - ./certs:/certs
-      - gema_nginx_logs:/var/log/nginx/
-      - nginx_static:/usr/share/nginx/html
-      - nginx_sockets:/sockets
+      - ../auth:/auth
+      - ../certs:/certs
+      - logs:/var/log/nginx/
+      - static:/usr/share/nginx/html
+      - sockets:/sockets
 
 networks:
-  gema_gema:
+  gema:
     external: true
 
 volumes:
-  nginx_static:
-  nginx_sockets:
-  gema_nginx_logs:
-    external: true
+  static:
+  sockets:
+  logs:

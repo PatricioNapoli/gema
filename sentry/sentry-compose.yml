@@ -1,0 +1,55 @@
+version: "3.7"
+
+services:
+  sentry:
+    image: sentry
+    env_file:
+      - ../.env
+      - sentry.env
+    deploy:
+      mode: replicated
+      replicas: 1
+      restart_policy:
+        condition: on-failure
+        delay: 5s
+        max_attempts: 3
+        window: 120s
+    volumes:
+      - data:/var/lib/sentry/files
+    networks:
+      - gema
+
+  sentry-cron:
+    image: sentry
+    command: ["run", "cron"]
+    env_file:
+      - ../.env
+      - sentry.env
+    deploy:
+      mode: replicated
+      replicas: 1
+      restart_policy:
+        condition: on-failure
+        delay: 5s
+        max_attempts: 3
+        window: 120s
+    networks:
+      - gema
+
+  sentry-worker:
+    image: sentry
+    command: ["run", "worker"]
+    env_file:
+      - ../.env
+      - sentry.env
+    deploy:
+      mode: global
+    networks:
+      - gema
+
+networks:
+  gema:
+    external: true
+
+volumes:
+  data:
