@@ -79,7 +79,7 @@ Afterwards:
 
 * Internal proxy auth, create dashboard for creating users. These users work for the HQ and the internal services, limit access to kibana.
 * Internal proxy discovery agent, options: https, port, websocket support, require auth, domain, max body size.
-* Cluster redis and postgres for data redundancy?
+* Cluster redis and postgres for data redundancy.
 * Stg environment considerations? Just use another cluster with adjusted DNS wildcard.
 * GEMA dashboard, hq.geminis.io, live ops, reports generation, ML, message broadcast through WS, push notifications, service routings, let client have a user
 

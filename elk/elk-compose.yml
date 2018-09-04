@@ -5,12 +5,12 @@ services:
     image: docker.elastic.co/elasticsearch/elasticsearch:6.3.2
     hostname: "elasticsearch"
     environment:
-      - discovery.zen.ping.unicast.hosts=elasticsearch
-      - discovery.zen.minimum_master_nodes=1
-      - cluster.name=elastic
-      - node.name=elasticsearch
-      - network.host=0.0.0.0
-      - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
+      discovery.zen.ping.unicast.hosts: elasticsearch
+      discovery.zen.minimum_master_nodes: 1
+      cluster.name: elastic
+      node.name: elasticsearch
+      network.host: 0.0.0.0
+      ES_JAVA_OPTS: -Xms512m -Xmx512m
     deploy:
       mode: replicated
       replicas: 1
