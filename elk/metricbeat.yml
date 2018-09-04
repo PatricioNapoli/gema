@@ -213,7 +213,7 @@ metricbeat.modules:
   username: ${POSTGRES_USER}
 
   # Password to use when connecting to PostgreSQL. Empty by default.
-  password: ${POSTGRES_PASWORD}
+  password: ${POSTGRES_PASSWORD}
 
 #-------------------------------- Redis Module -------------------------------
 - module: redis

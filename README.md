@@ -35,11 +35,19 @@ Using the following environment:
 `auth/htpasswd`  
 Use htpasswd online generator, bcrypt algorithm.
 
-## Setting up env variables
+## Setting up environment.
 Setup preset.env into .env.  
 
 Need to migrate dashboards from metricbeat and filebeat after deploying.  
-SSH to metricbeat and filebeat containers and run `./metricbeat setup -E setup.kibana.host=kibana:5601`.
+SSH to metricbeat and filebeat containers and run `./metricbeat setup -e -strict.perms=false -E setup.kibana.host=kibana:5601`.
+
+Create databases gema_nc and gema_sentry.
+
+SSH to sentry and run ./entrypoint.sh upgrade.
+
+Login to cloud and run migration from admin.
+
+ID for Grafana dashboard: 1860.
 
 ## Localhost resolution
 Add to /etc/hosts:  
@@ -52,6 +60,7 @@ Add to /etc/hosts:
 127.0.0.1 kibana.localhost
 127.0.0.1 cloud.localhost
 127.0.0.1 grafana.localhost
+127.0.0.1 sentry.localhost
 ```
 
 ## Running
@@ -73,19 +82,13 @@ Afterwards:
 * Cluster redis and postgres for data redundancy?
 * Stg environment considerations? Just use another cluster with adjusted DNS wildcard.
 * GEMA dashboard, hq.geminis.io, live ops, reports generation, ML, message broadcast through WS, push notifications, service routings, let client have a user
-* Use swarm secrets
-* Use swarm configs
+
 * Unit test GEMA
-* Tweak bash for deployment
-* Investigate service updating, (dynamic configs?)
 * Setup Gitlab yml CI/CD, Trigger SonarQube with Gitlab Push
-* Go Expvar
-* Go APM
-* Sentry Docker
 * Define /health for services, (HEALTHCHECK dockerfile) GEMA Dashboard should test those for health.
-* Define /metrics for services?
+* Define /metrics for services.
 * Define logstash log pattern for all services in GEMA for parsing.
-* Use wikis for documentation?
+* Use wikis for documentation.
 
 ---
 

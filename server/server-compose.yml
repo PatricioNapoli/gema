@@ -6,7 +6,12 @@ services:
     ports:
       - 8080:8080
     env_file:
-      - ./.env
+      - ../.env
+    environment:
+      ELASTIC_APM_SERVER_URL: http://goapm:8200
+      ELASTIC_APM_SERVICE_NAME: gema-proxy
+      ELASTIC_APM_ENVIRONMENT: $ENVIRONMENT
+      ELASTIC_APM_DEBUG: tracetransport=1
     deploy:
       mode: global
       restart_policy:
@@ -27,5 +32,5 @@ services:
       - ./:/go/src/gema/server
 
 networks:
-  gema_gema:
+  gema:
     external: true

@@ -58,6 +58,7 @@ services:
         delay: 5s
         max_attempts: 3
         window: 120s
+    command: metricbeat -e -strict.perms=false
 
   filebeat:
     image: docker.elastic.co/beats/filebeat:6.2.2
@@ -75,6 +76,23 @@ services:
         delay: 5s
         max_attempts: 3
         window: 120s
+    command: filebeat -e -strict.perms=false
+
+  goapm:
+    image: docker.elastic.co/apm/apm-server:6.4.0
+    networks:
+      - gema
+    deploy:
+      replicas: 1
+      mode: replicated
+      restart_policy:
+        condition: on-failure
+        delay: 5s
+        max_attempts: 3
+        window: 120s
+    volumes:
+      - ./apm-server.yml:/usr/share/apm-server/apm-server.yml
+    command: apm-server -e -strict.perms=false
 
 networks:
   gema:

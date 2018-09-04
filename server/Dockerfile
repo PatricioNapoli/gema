@@ -13,6 +13,7 @@ RUN go get -v -u github.com/go-pg/pg
 RUN go get -v -u github.com/codegangsta/gin
 RUN go get -v -u golang.org/x/crypto/bcrypt
 RUN go get -v github.com/iris-contrib/middleware/raven
+RUN go get -v -u github.com/elastic/apm-agent-go
 
 COPY . .
 

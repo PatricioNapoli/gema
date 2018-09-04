@@ -10,6 +10,8 @@ import (
 	ravenIris "github.com/iris-contrib/middleware/raven"
 	"regexp"
 	"github.com/getsentry/raven-go"
+	"github.com/elastic/apm-agent-go"
+	"fmt"
 )
 
 type Health struct {
@@ -19,7 +21,7 @@ type Health struct {
 var gema *server.Server
 
 func main() {
-	raven.SetDSN("http://282f7b8847c743849c11096109db5615:8fa28ff9e3a349f78d141a6a3290179a@sentry:9000/1")
+	raven.SetDSN("http://c738fc18de3e4351b58ef0130899ab1e:479d921d673d4c9dbc1f78696d85eaba@sentry:9000/1")
 
 	app := iris.New()
 
@@ -107,8 +109,6 @@ func loginPostHandler(ctx iris.Context) {
 }
 
 func setupGetHandler(ctx iris.Context) {
-	panic("shit")
-
 	if !gema.IsFirstLogin() {
 		ctx.Redirect("/gema/login")
 	}
@@ -135,6 +135,9 @@ func setupPostHandler(ctx iris.Context) {
 }
 
 func proxyHandler(ctx iris.Context) {
+	tx := elasticapm.DefaultTracer.StartTransaction(fmt.Sprintf("%s %s", ctx.Method(), ctx.Path()), "proxy")
+	tx.End()
+
 	if gema.IsFirstLogin() {
 		ctx.Redirect("/gema/setup")
 	}
