@@ -39,15 +39,15 @@ Use htpasswd online generator, bcrypt algorithm.
 Setup preset.env into .env.  
 
 Need to migrate dashboards from metricbeat and filebeat after deploying.  
-SSH to metricbeat and filebeat containers and run `./metricbeat setup -e -strict.perms=false -E setup.kibana.host=kibana:5601`.
+SSH to metricbeat and filebeat containers and run `./metricbeat setup -e -strict.perms=false -E setup.kibana.host=kibana:5601`.  
 
-Create databases gema_nc and gema_sentry.
+Create databases gema_nc and gema_sentry.  
 
-SSH to sentry and run ./entrypoint.sh upgrade.
+SSH to sentry and run ./entrypoint.sh upgrade.  
 
-Login to cloud and run migration from admin.
+Login to cloud and run migration from admin.  
 
-ID for Grafana dashboard: 1860.
+ID for Grafana dashboard: 1860.  
 
 ## Localhost resolution
 Add to /etc/hosts:  
@@ -56,7 +56,6 @@ Add to /etc/hosts:
 127.0.0.1 hq.localhost
 127.0.0.1 portainer.localhost
 127.0.0.1 pgadmin.localhost
-127.0.0.1 registry.localhost
 127.0.0.1 kibana.localhost
 127.0.0.1 cloud.localhost
 127.0.0.1 grafana.localhost
@@ -83,6 +82,9 @@ Afterwards:
 * Stg environment considerations? Just use another cluster with adjusted DNS wildcard.
 * GEMA dashboard, hq.geminis.io, live ops, reports generation, ML, message broadcast through WS, push notifications, service routings, let client have a user
 
+* Custom 500
+* Custom 404
+* Custom 403
 * Unit test GEMA
 * Setup Gitlab yml CI/CD, Trigger SonarQube with Gitlab Push
 * Define /health for services, (HEALTHCHECK dockerfile) GEMA Dashboard should test those for health.

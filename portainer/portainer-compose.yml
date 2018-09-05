@@ -52,6 +52,8 @@ services:
         delay: 5s
         max_attempts: 3
         window: 120s
+    ports:
+    - 5000:5000
     networks:
       - gema
     volumes:

@@ -1,6 +1,8 @@
 package models
 
-import "github.com/go-pg/pg"
+import (
+	"github.com/go-pg/pg"
+)
 
 type User struct {
 	TableName struct{} `sql:"gema_users"`
@@ -11,11 +13,9 @@ type User struct {
 	Hash string
 }
 
-func GetUser(db *pg.DB, email string) *User{
-	u := &User{}
-	err := db.Model(u).Where("email = ?", email).Select()
+func (s* User) FetchUserByEmail(db *pg.DB, email string) {
+	err := db.Model(s).Where("email = ?", email).Select()
 	if err != nil {
-		return nil
+		panic(err)
 	}
-	return u
 }

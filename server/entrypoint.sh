@@ -1,6 +1,6 @@
 #!/bin/sh
 
-if [[ -v ENV_PROD ]]; then
+if [ "$ENVIRONMENT" != "DEVELOPMENT" ]; then
     go build -o /go/bin/gema-server main.go
     gema-server
 else

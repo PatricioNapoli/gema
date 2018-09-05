@@ -1,23 +1,20 @@
 version: "3.7"
 
 services:
-  server:
-    image: localhost:5000/gema/server
-    ports:
-      - 8080:8080
+  agent:
+    image: localhost:5000/gema/agent
     env_file:
       - ../.env
-    environment:
-      ELASTIC_APM_SERVER_URL: http://goapm:8200
-      ELASTIC_APM_SERVICE_NAME: gema-proxy
-      ELASTIC_APM_ENVIRONMENT: $ENVIRONMENT
     deploy:
-      mode: global
+      replicas: 1
+      mode: replicated
       restart_policy:
         condition: on-failure
         delay: 5s
         max_attempts: 3
         window: 120s
+      placement:
+        constraints: [node.labels.category == main]
     healthcheck:
       test: wget --quiet --tries=1 --spider 127.0.0.1:8080/gema/health || exit 1
       interval: 5s
@@ -26,9 +23,7 @@ services:
     networks:
         - gema
     volumes:
-      - ./templates:/go/bin/templates
-      - ./static:/go/bin/static
-      - ./:/go/src/gema/server
+      - /var/run/docker.sock:/docker.sock
 
 networks:
   gema:
