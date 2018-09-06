@@ -22,7 +22,7 @@ func main() {
 		IP:       true,
 		Method:   true,
 		Path:     true,
-		Query:    false,
+		Query:    true,
 		Columns:  false,
 		LogFunc:  nil,
 		Skippers: []logger.SkipperFunc{logSkipper},
