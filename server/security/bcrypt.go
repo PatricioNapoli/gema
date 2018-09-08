@@ -1,12 +1,14 @@
 package security
 
-import "golang.org/x/crypto/bcrypt"
+import (
+	"gema/server/utils"
+
+	"golang.org/x/crypto/bcrypt"
+)
 
 func GetHash(password string) string {
 	hash, err := bcrypt.GenerateFromPassword([]byte(password), bcrypt.MinCost)
-	if err != nil {
-		panic(err)
-	}
+	utils.Handle(err)
 	return string(hash)
 }
 

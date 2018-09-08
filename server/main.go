@@ -1,13 +1,15 @@
 package main
 
 import (
-	"github.com/kataras/iris"
 	"gema/server/server"
-	"github.com/kataras/iris/middleware/logger"
-	ravenIris "github.com/iris-contrib/middleware/raven"
-	"regexp"
-	"github.com/getsentry/raven-go"
+	"gema/server/views"
 	"os"
+	"regexp"
+
+	"github.com/getsentry/raven-go"
+	ravenIris "github.com/iris-contrib/middleware/raven"
+	"github.com/kataras/iris"
+	"github.com/kataras/iris/middleware/logger"
 )
 
 func main() {
@@ -36,10 +38,18 @@ func main() {
 		gema.Dispose()
 	})
 
-	app.RegisterView(iris.HTML("./templates/landing", ".html").Layout("layout.html"))
+	app.RegisterView(iris.HTML("./templates", ".html"))
 	app.StaticWeb("/static", "./static")
 
-	gemaRoute := app.Party("/gema")
+	app.OnErrorCode(iris.StatusNotFound, func(ctx iris.Context) {
+		views.NotFound(ctx)
+	})
+
+	app.OnErrorCode(iris.StatusInternalServerError, func(ctx iris.Context) {
+		views.InternalError(ctx)
+	})
+
+	gemaRoute := app.Party("/gema").Layout("landing/landing_layout.html")
 	gemaRoute.Get("/health", gema.Handlers.Health)
 	gemaRoute.Post("/login", gema.Handlers.LoginPost)
 	gemaRoute.Get("/setup", gema.Handlers.SetupGet)
@@ -48,7 +58,7 @@ func main() {
 	app.Handle("ALL", "*", gema.Handlers.Proxy)
 
 	app.Logger().Info("Starting GEMA server.")
-	app.Run(iris.Addr(":8080"), iris.WithConfiguration(iris.Configuration{
+	app.Run(iris.Addr(":80"), iris.WithConfiguration(iris.Configuration{
 		DisableStartupLog: true,
 	}))
 }

@@ -1,12 +1,8 @@
 version: "3.7"
 
 services:
-  test:
-    image: jwilder/whoami
-    labels:
-      gema.service: test
-      gema.auth: 1
-      gema.subdomain: test
+  backup:
+    image: localhost:5000/gema/backup
     deploy:
       mode: global
       restart_policy:
@@ -14,9 +10,13 @@ services:
         delay: 5s
         max_attempts: 3
         window: 120s
+    healthcheck:
+      test: wget --quiet --tries=1 --spider 127.0.0.1/ || exit 1
+      interval: 5s
+      timeout: 10s
+      retries: 3
     networks:
         - gema
-
 
 networks:
   gema:

@@ -88,7 +88,6 @@ Afterwards:
 * Unit test GEMA
 * Setup Gitlab yml CI/CD, Trigger SonarQube with Gitlab Push
 * Define /health for services, (HEALTHCHECK dockerfile) GEMA Dashboard should test those for health.
-* Define /metrics for services.
 * Define logstash log pattern for all services in GEMA for parsing.
 * Use wikis for documentation.
 

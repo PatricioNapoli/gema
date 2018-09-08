@@ -47,9 +47,25 @@ services:
     networks:
       - gema
 
+  sentry-redis:
+    image: redis:alpine
+    deploy:
+      mode: replicated
+      replicas: 1
+      restart_policy:
+        condition: on-failure
+        delay: 5s
+        max_attempts: 3
+        window: 120s
+    networks:
+      - gema
+    volumes:
+      - redis_data:/data
+
 networks:
   gema:
     external: true
 
 volumes:
   data:
+  redis_data:

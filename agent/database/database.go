@@ -1,11 +1,17 @@
 package database
 
-import "github.com/go-redis/redis"
+import (
+	"log"
+
+	"github.com/go-redis/redis"
+)
 
 func New() *redis.Client {
+	log.Printf("Connecting to database.")
+
 	client := redis.NewClient(&redis.Options{
-		Addr:     "redis:6379",
-		DB:       0,
+		Addr: "redis:6379",
+		DB:   0,
 	})
 
 	return client

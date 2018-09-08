@@ -87,6 +87,6 @@ a {
     background-color: #53002A;
 }
 
-.login-container, footer {
+.center-container, footer {
     z-index: 10;
 }

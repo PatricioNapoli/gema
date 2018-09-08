@@ -1,16 +1,16 @@
 package dialer
 
 import (
-	"net"
-	"gema/agent/utils"
-	"net/url"
-	"net/http"
-	"fmt"
-	"encoding/json"
 	"bytes"
-	"regexp"
-	"io"
+	"fmt"
 	"gema/agent/event"
+	"gema/agent/utils"
+	"io"
+	"log"
+	"net"
+	"net/http"
+	"net/url"
+	"regexp"
 )
 
 var jsonRegex = regexp.MustCompile(`{.+}`)
@@ -20,18 +20,20 @@ type Filters struct {
 }
 
 type Dialer struct {
-	Addr string
+	Addr    string
 	Handler *event.Handler
 }
 
 func New(addr string) *Dialer {
 	return &Dialer{
-		Addr: addr,
+		Addr:    addr,
 		Handler: event.New(),
 	}
 }
 
 func (d *Dialer) MonitorEvents(filters Filters) {
+	log.Printf("Starting event monitoring of swarm.")
+
 	c := d.dial()
 	defer c.Close()
 
@@ -56,37 +58,36 @@ func (d *Dialer) readFromConn(r io.Reader) {
 
 		j := match[0]
 
-		ev := &event.Event{}
-		err = json.Unmarshal([]byte(j), ev)
-		utils.Handle(err)
+		ev := event.DefaultEvent()
+		utils.FromJSON([]byte(j), ev)
 
 		go d.Handler.HandleEvent(ev)
 	}
 }
 
 func (d *Dialer) dial() net.Conn {
+	log.Printf("Dialing %s", d.Addr)
+
 	c, err := net.Dial("unix", d.Addr)
 	utils.Handle(err)
 	return c
 }
 
 func makeRequest(method string, Url string, filters Filters) http.Request {
-	j, err := json.Marshal(filters)
-	utils.Handle(err)
+	j := string(utils.ToJSON(filters))
 
-	js := string(j)
-
-	u, _ := url.Parse(fmt.Sprintf("%s?filters=%s", Url, js))
+	u, _ := url.Parse(fmt.Sprintf("%s?filters=%s", Url, j))
 
 	r := http.Request{
 		Method: method,
-		URL: u,
-
+		URL:    u,
 	}
 	return r
 }
 
 func writeToConn(r http.Request, c net.Conn) {
+	log.Printf("Writing to API: %s", r.URL.String())
+
 	var buf bytes.Buffer
 	r.Write(&buf)
 

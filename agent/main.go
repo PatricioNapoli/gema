@@ -1,17 +1,19 @@
 package main
 
 import (
-	"gema/agent/health"
 	"gema/agent/dialer"
+	"gema/agent/health"
+	"log"
 )
 
-
 func main() {
-	go health.New()
+	log.Printf("Starting GEMA agent.")
+
+	go health.New(":80", "/gema/health")
 
 	d := dialer.New("/var/run/docker.sock")
 
 	d.MonitorEvents(dialer.Filters{
-		Label: []string{"gema.expose"},
+		Label: []string{"gema.service"},
 	})
 }

@@ -3,8 +3,6 @@ version: "3.7"
 services:
   server:
     image: localhost:5000/gema/server
-    ports:
-      - 8080:8080
     env_file:
       - ../.env
     environment:
@@ -19,7 +17,7 @@ services:
         max_attempts: 3
         window: 120s
     healthcheck:
-      test: wget --quiet --tries=1 --spider 127.0.0.1:8080/gema/health || exit 1
+      test: wget --quiet --tries=1 --spider 127.0.0.1/gema/health || exit 1
       interval: 5s
       timeout: 10s
       retries: 3

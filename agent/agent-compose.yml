@@ -16,14 +16,14 @@ services:
       placement:
         constraints: [node.labels.category == main]
     healthcheck:
-      test: wget --quiet --tries=1 --spider 127.0.0.1:8080/gema/health || exit 1
+      test: wget --quiet --tries=1 --spider 127.0.0.1/gema/health || exit 1
       interval: 5s
       timeout: 10s
       retries: 3
     networks:
         - gema
     volumes:
-      - /var/run/docker.sock:/docker.sock
+      - /var/run/docker.sock:/var/run/docker.sock
 
 networks:
   gema:

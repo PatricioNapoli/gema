@@ -1,8 +1,9 @@
 package database
 
 import (
-	"github.com/go-pg/pg"
 	"gema/server/models"
+
+	"github.com/go-pg/pg"
 	"github.com/go-pg/pg/orm"
 )
 
@@ -23,7 +24,7 @@ func New(sql *pg.DB) *Database {
 	return d
 }
 
-func (s* Database) Dispose() {
+func (s *Database) Dispose() {
 	s.SQL.Close()
 }
 

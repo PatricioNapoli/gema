@@ -1,21 +1,36 @@
 package handlers
 
 import (
-	"github.com/kataras/iris"
-	"gema/server/models"
-	"gema/server/views"
-	"gema/server/security"
-	"github.com/kataras/iris/sessions/sessiondb/redis"
-	"github.com/kataras/iris/sessions"
-	"gema/server/database"
-	"github.com/elastic/apm-agent-go"
 	"fmt"
+	"net/url"
+
+	"gema/server/database"
+	"gema/server/models"
+	"gema/server/security"
+	"gema/server/utils"
+	"gema/server/views"
+
+	"github.com/elastic/apm-agent-go"
+	"github.com/go-redis/redis"
+	"github.com/kataras/iris"
+	"github.com/kataras/iris/core/host"
+	"github.com/kataras/iris/sessions"
 )
 
+type service struct {
+	Name      string `json:"name"`
+	Proto     string `json:"proto"`
+	Port      string `json:"port"`
+	Auth      string `json:"auth"`
+	Domain    string `json:"domain"`
+	SubDomain string `json:"subdomain"`
+	Path      string `json:"path"`
+}
+
 type Handlers struct {
-	NoSQL   *redis.Database
-	Database     *database.Database
-	Session *sessions.Sessions
+	NoSQL    *redis.Client
+	Database *database.Database
+	Session  *sessions.Sessions
 }
 
 func (s *Handlers) Dispose() {
@@ -23,12 +38,12 @@ func (s *Handlers) Dispose() {
 	s.Database.Dispose()
 }
 
-type Health struct {
+type health struct {
 	Status string
 }
 
 func (s *Handlers) Health(ctx iris.Context) {
-	ctx.JSON(&Health{
+	ctx.JSON(&health{
 		Status: "OK",
 	})
 }
@@ -38,17 +53,44 @@ func (s *Handlers) Proxy(ctx iris.Context) {
 		ctx.Redirect("/gema/setup")
 	}
 
+	tx := elasticapm.DefaultTracer.StartTransaction(fmt.Sprintf("%s %s%s", ctx.Method(), ctx.Host(), ctx.Path()), "gateway")
+	defer tx.End()
+
 	session := s.Session.Start(ctx)
 
-	if session.GetBooleanDefault("authorized", false) {
+	ctx.Application().Logger().Info(ctx.GetHeader("Real-Host"))
+
+	svc, err := s.NoSQL.Get(fmt.Sprintf("service:%s", ctx.Host())).Result()
+	if err == redis.Nil {
+		ctx.NotFound()
+		return
+	}
+
+	serv := &service{}
+	utils.FromJSON([]byte(svc), &serv)
+
+	if session.GetBooleanDefault("authorized", false) || serv.Auth == "0" {
 		ctx.Application().Logger().Info(ctx.Host())
 
-		tx := elasticapm.DefaultTracer.StartTransaction(fmt.Sprintf("%s %s", ctx.Method(), ctx.Path()), "proxy")
+		tx := elasticapm.DefaultTracer.StartTransaction(fmt.Sprintf("%s %s%s", ctx.Method(), ctx.Host(), ctx.Path()), "proxy")
 		defer tx.End()
 
-		//target, _ := url.Parse("http://kibana:5601")
-		//proxy := host.ProxyHandler(target)
-		//proxy.ServeHTTP(ctx.ResponseWriter(), ctx.Request())
+		sub := ""
+		if serv.SubDomain != "" {
+			sub = fmt.Sprintf("%s.", serv.SubDomain)
+		}
+		port := ""
+		if serv.Port != "" {
+			port = fmt.Sprintf(":%s", serv.Port)
+		}
+
+		route := fmt.Sprintf("%s://%s%s%s%s", serv.Proto, sub, serv.Domain, port, serv.Path)
+
+		ctx.Application().Logger().Info(fmt.Sprintf("Handling reverse proxy to %s", route))
+
+		target, _ := url.Parse(route)
+		proxy := host.ProxyHandler(target)
+		proxy.ServeHTTP(ctx.ResponseWriter(), ctx.Request())
 	}
 
 	views.LoginPage(ctx)
@@ -97,8 +139,8 @@ func (s *Handlers) SetupPost(ctx iris.Context) {
 
 	s.Database.SQL.Insert(&models.User{
 		Email: email,
-		Name: name,
-		Hash: hash,
+		Name:  name,
+		Hash:  hash,
 	})
 
 	ctx.Application().Logger().Info("Admin account ready.")
