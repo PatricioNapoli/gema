@@ -39,7 +39,7 @@ func DefaultEvent() *Event {
 				Proto:     "http",
 				Port:      "",
 				Auth:      "0",
-				Domain:    "geminis.io",
+				Domain:    "",
 				SubDomain: "",
 				Path:      "/",
 			},
@@ -91,23 +91,40 @@ func (h *Handler) HandleEvent(ev *Event) {
 
 	j := string(utils.ToJSON(svc))
 
-	stg := ""
-	if os.Getenv("ENVIRONMENT" == "STAGING") {
-		stg = "stg"
-	}
-
-	route := ""
-
-	if svc.Domain != "" {
-		route = fmt.Sprintf("%s.%s", svc.SubDomain, svc.Domain)
-	}
-
-	if os.Getenv("ENVIRONMENT") == "DEVELOPMENT" {
-		route = fmt.Sprintf("%s.%s", svc.SubDomain, "hq.localhost")
-	}
+	route := getRoute(svc)
 
 	err := h.Database.Set(fmt.Sprintf("service:%s", route), j, 0).Err()
 	utils.Handle(err)
 
 	log.Printf("Created route: %s for service: %s", route, svc.Name)
+}
+
+func getRoute(svc Service) string {
+	route := ""
+
+	stg := ""
+	if os.Getenv("ENVIRONMENT") == "STAGING" {
+		stg = "stg."
+	}
+
+	sub := ""
+	if svc.SubDomain != "" {
+		sub = svc.SubDomain + "."
+	}
+
+	if svc.Domain != "" {
+		route = fmt.Sprintf("%s%s%s", sub, stg, svc.Domain)
+	} else {
+		route = fmt.Sprintf("%s%s", sub, os.Getenv("HQ_DOMAIN"))
+	}
+
+	if os.Getenv("ENVIRONMENT") == "DEVELOPMENT" {
+		hq := "hq."
+		if svc.Domain != "" {
+			hq = svc.Domain + "."
+		}
+		route = fmt.Sprintf("%s%s%s", sub, hq, "localhost")
+	}
+
+	return route
 }

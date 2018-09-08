@@ -3,6 +3,7 @@ package handlers
 import (
 	"fmt"
 	"net/url"
+	"os"
 
 	"gema/server/database"
 	"gema/server/models"
@@ -53,12 +54,15 @@ func (s *Handlers) Proxy(ctx iris.Context) {
 		ctx.Redirect("/gema/setup")
 	}
 
+	if ctx.Host() == os.Getenv("HQ_DOMAIN") {
+		s.HQ(ctx)
+		return
+	}
+
 	tx := elasticapm.DefaultTracer.StartTransaction(fmt.Sprintf("%s %s%s", ctx.Method(), ctx.Host(), ctx.Path()), "gateway")
 	defer tx.End()
 
 	session := s.Session.Start(ctx)
-
-	ctx.Application().Logger().Info(ctx.GetHeader("Real-Host"))
 
 	svc, err := s.NoSQL.Get(fmt.Sprintf("service:%s", ctx.Host())).Result()
 	if err == redis.Nil {
@@ -70,21 +74,15 @@ func (s *Handlers) Proxy(ctx iris.Context) {
 	utils.FromJSON([]byte(svc), &serv)
 
 	if session.GetBooleanDefault("authorized", false) || serv.Auth == "0" {
-		ctx.Application().Logger().Info(ctx.Host())
-
 		tx := elasticapm.DefaultTracer.StartTransaction(fmt.Sprintf("%s %s%s", ctx.Method(), ctx.Host(), ctx.Path()), "proxy")
 		defer tx.End()
 
-		sub := ""
-		if serv.SubDomain != "" {
-			sub = fmt.Sprintf("%s.", serv.SubDomain)
-		}
 		port := ""
 		if serv.Port != "" {
 			port = fmt.Sprintf(":%s", serv.Port)
 		}
 
-		route := fmt.Sprintf("%s://%s%s%s%s", serv.Proto, sub, serv.Domain, port, serv.Path)
+		route := fmt.Sprintf("%s://%s%s%s", serv.Proto, serv.Name, port, serv.Path)
 
 		ctx.Application().Logger().Info(fmt.Sprintf("Handling reverse proxy to %s", route))
 
@@ -146,4 +144,8 @@ func (s *Handlers) SetupPost(ctx iris.Context) {
 	ctx.Application().Logger().Info("Admin account ready.")
 
 	ctx.Redirect("/")
+}
+
+func (s *Handlers) HQ(ctx iris.Context) {
+	ctx.WriteString("HQ")
 }

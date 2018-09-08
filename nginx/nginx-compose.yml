@@ -23,8 +23,7 @@ services:
       - ../auth:/auth
       - ../certs:/certs
       - logs:/var/log/nginx/
-      - static:/usr/share/nginx/html
-      - sockets:/sockets
+      - static:/static
 
 networks:
   gema:
@@ -32,5 +31,4 @@ networks:
 
 volumes:
   static:
-  sockets:
   logs:

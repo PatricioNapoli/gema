@@ -22,10 +22,15 @@ services:
     image: dpage/pgadmin4
     env_file:
       - ../.env
+    labels:
+      gema.service: pgadmin
+      gema.auth: 1
+      gema.proto: "http"
+      gema.subdomain: pgadmin
     environment:
       PGADMIN_DEFAULT_EMAIL: admin@geminis.io
       PGADMIN_DEFAULT_PASSWORD: $POSTGRES_PASSWORD
-      PGADMIN_ENABLE_TLS: "True"
+      # PGADMIN_ENABLE_TLS: "True"
     deploy:
       mode: replicated
       replicas: 1
@@ -38,8 +43,8 @@ services:
       - gema
     volumes:
       - pgadmin_data:/var/lib/pgadmin
-      - ../certs/domain.crt:/certs/server.cert
-      - ../certs/domain.key:/certs/server.key
+      # - ../certs/domain.crt:/certs/server.cert
+      # - ../certs/domain.key:/certs/server.key
 
 networks:
   gema:

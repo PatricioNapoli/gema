@@ -38,18 +38,26 @@ func main() {
 		gema.Dispose()
 	})
 
-	app.RegisterView(iris.HTML("./templates", ".html"))
+	app.RegisterView(iris.HTML("./templates", ".html").Layout("landing/landing_layout.html"))
 	app.StaticWeb("/static", "./static")
 
-	app.OnErrorCode(iris.StatusNotFound, func(ctx iris.Context) {
-		views.NotFound(ctx)
+	app.OnErrorCode(iris.StatusBadGateway, func(ctx iris.Context) {
+		views.InternalError(ctx)
 	})
 
 	app.OnErrorCode(iris.StatusInternalServerError, func(ctx iris.Context) {
 		views.InternalError(ctx)
 	})
 
-	gemaRoute := app.Party("/gema").Layout("landing/landing_layout.html")
+	app.OnErrorCode(iris.StatusNotFound, func(ctx iris.Context) {
+		views.NotFound(ctx)
+	})
+
+	app.OnErrorCode(iris.StatusForbidden, func(ctx iris.Context) {
+		views.InternalError(ctx)
+	})
+
+	gemaRoute := app.Party("/gema")
 	gemaRoute.Get("/health", gema.Handlers.Health)
 	gemaRoute.Post("/login", gema.Handlers.LoginPost)
 	gemaRoute.Get("/setup", gema.Handlers.SetupGet)

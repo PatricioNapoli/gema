@@ -18,7 +18,6 @@ RUN go get -v -u github.com/go-redis/redis
 
 COPY . .
 
-COPY static /go/bin/static
 COPY templates /go/bin/templates
 
 RUN go build -v -o /go/bin/gema-server main.go

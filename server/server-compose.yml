@@ -23,11 +23,15 @@ services:
       retries: 3
     networks:
         - gema
-    volumes:
+    volumes:      
       - ./templates:/go/bin/templates
-      - ./static:/go/bin/static
+      - nginx_static:/static
       - ./:/go/src/gema/server
 
 networks:
   gema:
+    external: true
+
+volumes:
+  nginx_static:
     external: true
