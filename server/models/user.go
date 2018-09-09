@@ -13,9 +13,14 @@ type User struct {
 	Hash  string
 }
 
-func (s *User) FetchUserByEmail(db *pg.DB, email string) {
-	err := db.Model(s).Where("email = ?", email).Select()
-	if err != nil {
+func FetchUserByEmail(db *pg.DB, email string) *User {
+	user := &User{}
+	err := db.Model(user).Where("email = ?", email).Select()
+	if err == pg.ErrNoRows {
+		return nil
+	} else if err != nil {
 		panic(err)
 	}
+
+	return user
 }

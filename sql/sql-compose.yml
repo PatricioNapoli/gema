@@ -25,7 +25,6 @@ services:
     labels:
       gema.service: pgadmin
       gema.auth: 1
-      gema.proto: "http"
       gema.subdomain: pgadmin
     environment:
       PGADMIN_DEFAULT_EMAIL: admin@geminis.io

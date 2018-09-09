@@ -10,7 +10,6 @@ services:
       cluster.name: elastic
       node.name: elasticsearch
       network.host: 0.0.0.0
-      ES_JAVA_OPTS: -Xms512m -Xmx512m
     deploy:
       mode: replicated
       replicas: 1
@@ -28,6 +27,10 @@ services:
     image: docker.elastic.co/kibana/kibana:6.3.2
     env_file:
       - ../.env
+    labels:
+      gema.service: kibana
+      gema.auth: 1
+      gema.subdomain: kibana
     environment:
       ELASTICSEARCH_URL: http://elasticsearch:9200
     deploy:

@@ -39,7 +39,7 @@ func main() {
 	})
 
 	app.RegisterView(iris.HTML("./templates", ".html").Layout("landing/landing_layout.html"))
-	app.StaticWeb("/static", "./static")
+	app.StaticWeb("/static/gema", "./static/gema")
 
 	app.OnErrorCode(iris.StatusBadGateway, func(ctx iris.Context) {
 		views.InternalError(ctx)
@@ -68,6 +68,7 @@ func main() {
 	app.Logger().Info("Starting GEMA server.")
 	app.Run(iris.Addr(":80"), iris.WithConfiguration(iris.Configuration{
 		DisableStartupLog: true,
+		DisablePathCorrection: true,
 	}))
 }
 
