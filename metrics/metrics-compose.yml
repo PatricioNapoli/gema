@@ -31,6 +31,11 @@ services:
 
   grafana:
     image: grafana/grafana
+    labels:
+      gema.service: grafana
+      gema.auth: 1
+      gema.port: 3000
+      gema.subdomain: grafana
     deploy:
       mode: replicated
       replicas: 1

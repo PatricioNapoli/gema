@@ -30,6 +30,7 @@ services:
       - ../certs:/certs
       - logs:/var/log/nginx/
       - static:/static
+      - public:/usr/share/nginx/html
 
 networks:
   gema:
@@ -37,4 +38,5 @@ networks:
 
 volumes:
   static:
+  public:
   logs:

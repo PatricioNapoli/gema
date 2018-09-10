@@ -3,6 +3,10 @@ version: "3.7"
 services:
   nextcloud:
     image: nextcloud:apache
+    labels:
+      gema.service: nextcloud
+      gema.auth: 1
+      gema.subdomain: cloud
     environment:
       POSTGRES_HOST: postgres
       POSTGRES_DB: gema_nc

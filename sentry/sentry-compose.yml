@@ -3,6 +3,11 @@ version: "3.7"
 services:
   sentry:
     image: sentry
+    labels:
+      gema.service: sentry
+      gema.auth: 1
+      gema.port: 9000
+      gema.subdomain: sentry
     env_file:
       - ../.env
       - sentry.env

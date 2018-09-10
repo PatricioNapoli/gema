@@ -50,17 +50,10 @@ Login to cloud and run migration from admin.
 ID for Grafana dashboard: 1860.  
 
 ## Localhost resolution
-Add to /etc/hosts:  
+Use DNSMASQ for wildcard localhost subdomain resolution, like *.localhost.
+Add to /etc/dnsmasq.conf:
 
-```
-127.0.0.1 hq.localhost
-127.0.0.1 portainer.localhost
-127.0.0.1 pgadmin.localhost
-127.0.0.1 kibana.localhost
-127.0.0.1 cloud.localhost
-127.0.0.1 grafana.localhost
-127.0.0.1 sentry.localhost
-```
+`address=/.local/127.0.0.1`
 
 ## Running
 
@@ -77,14 +70,9 @@ Afterwards:
 ## TODO
 
 * Internal proxy auth, create dashboard for creating users. These users work for the HQ and the internal services, limit access to kibana.
-* Internal proxy discovery agent, options: https, port, websocket support, require auth, domain, max body size.
 * Cluster redis and postgres for data redundancy.
-* Stg environment considerations? Just use another cluster with adjusted DNS wildcard.
 * GEMA dashboard, hq.geminis.io, live ops, reports generation, ML, message broadcast through WS, push notifications, service routings, let client have a user
 
-* Custom 500
-* Custom 404
-* Custom 403
 * Unit test GEMA
 * Setup Gitlab yml CI/CD, Trigger SonarQube with Gitlab Push
 * Define /health for services, (HEALTHCHECK dockerfile) GEMA Dashboard should test those for health.

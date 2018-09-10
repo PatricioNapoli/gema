@@ -30,6 +30,7 @@ services:
     labels:
       gema.service: kibana
       gema.auth: 1
+      gema.port: 5601
       gema.subdomain: kibana
     environment:
       ELASTICSEARCH_URL: http://elasticsearch:9200
