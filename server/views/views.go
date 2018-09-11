@@ -26,6 +26,10 @@ func Forbidden(ctx iris.Context) {
 	renderError(ctx, "403", "You cannot perform this action.")
 }
 
+func HQ(ctx iris.Context) {
+	ctx.WriteString("HQ")
+}
+
 func renderError(ctx iris.Context, code string, description string) {
 	ctx.ViewLayout("error/error_layout.html")
 	ctx.ViewData("Code", code)

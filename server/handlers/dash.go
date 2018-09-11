@@ -1,18 +1,32 @@
 package handlers
 
 import (
-	"github.com/go-redis/redis"
-	"gema/server/database"
-	"github.com/kataras/iris/sessions"
 	"github.com/kataras/iris"
+	"gema/server/services"
+	"gema/server/views"
+	"fmt"
 )
 
 type Dashboard struct {
-	NoSQL    *redis.Client
-	Database *database.Database
-	Session  *sessions.Sessions
+	Services *services.Services
 }
 
 func (s *Dashboard) HQ(ctx iris.Context) {
-	ctx.WriteString("HQ")
+	s.requireLogin(ctx)
+
+	views.HQ(ctx)
+}
+
+func (s *Dashboard) requireLogin(ctx iris.Context) {
+	session := s.Services.Session.Start(ctx)
+
+	if session.GetBooleanDefault("authorized", false) {
+		return
+	}
+
+	if ctx.URLParamExists("next") {
+		ctx.ViewData("next", fmt.Sprintf("?next=%s", ctx.URLParam("next")))
+	}
+
+	views.LoginPage(ctx)
 }

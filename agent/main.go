@@ -9,7 +9,7 @@ import (
 func main() {
 	log.Printf("Starting GEMA agent.")
 
-	go health.New(":80", "/gema/health")
+	go health.New(":80", "/health")
 
 	d := dialer.New("/var/run/docker.sock")
 

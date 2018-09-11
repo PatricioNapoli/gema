@@ -79,6 +79,8 @@ Afterwards:
 * Define logstash log pattern for all services in GEMA for parsing.
 * Use wikis for documentation.
 
+* Close logstash UDP port
+
 ---
 
 ### Data Analytics

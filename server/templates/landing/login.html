@@ -1,4 +1,4 @@
-<form action="/gema/login" method="post">
+<form action="/login{{ .next }}" method="post">
 {{ if .Invalid }}
     <i class="fas fa-exclamation" style="color:orangered; margin-right: 20px;"></i> Incorrect user or password
 {{ end }}
