@@ -12,8 +12,8 @@ import (
 
 	"github.com/go-redis/redis"
 	"github.com/kataras/iris"
-	"github.com/kataras/iris/core/netutil"
 	"gema/server/services"
+	"github.com/kataras/golog"
 )
 
 var (
@@ -89,7 +89,7 @@ func (s *Proxy) proxy(ctx iris.Context) {
 
 	if ctx.Host() == os.Getenv("HQ_DOMAIN") {
 		target, _ := url.Parse("http://localhost:81/")
-		proxy := proxyHandler(target, ctx.Host(), ctx.GetHeader("X-Real-IP"))
+		proxy := proxyHandler(target, ctx.Host(), ctx.GetHeader("X-Real-IP"), s.App.Logger())
 		proxy.ServeHTTP(ctx.ResponseWriter(), ctx.Request())
 		return
 	}
@@ -112,10 +112,35 @@ func (s *Proxy) proxy(ctx iris.Context) {
 			port = fmt.Sprintf(":%s", serv.Port)
 		}
 
-		route := fmt.Sprintf("%s://%s%s%s", serv.Proto, serv.Name, port, serv.Path)
+		proto := serv.Proto
+		if ctx.Method() == "CONNECT" {
+			if proto == "http" {
+				proto = "ws"
+			} else {
+				s.App.Logger().Info("Setting protocol.")
+				proto = "wss"
+			}
+		}
+
+		route := fmt.Sprintf("%s://%s%s%s", proto, serv.Name, port, serv.Path)
 
 		target, _ := url.Parse(route)
-		proxy := proxyHandler(target, ctx.Host(), ctx.GetHeader("X-Real-IP"))
+
+		// Handle WS
+		if ctx.Method() == "CONNECT" {
+			s.App.Logger().Info("Handling connect.")
+			wsProxy := NewWebSocketProxy(target)
+			wsProxy.ServeHTTP(ctx.ResponseWriter(), ctx.Request())
+			return
+		}
+
+		if ctx.GetHeader("Upgrade") == "websocket" {
+			s.App.Logger().Info("Handling upgrade.")
+			ctx.Request().Header.Set("Connection", "upgrade")
+			ctx.Request().Header.Set("Upgrade", "websocket")
+		}
+
+		proxy := proxyHandler(target, ctx.Host(), ctx.GetHeader("X-Real-IP"), s.App.Logger())
 		proxy.ServeHTTP(ctx.ResponseWriter(), ctx.Request())
 		return
 	}
@@ -127,7 +152,7 @@ func (s *Proxy) proxy(ctx iris.Context) {
 // This proxy handler has almost the same functionalty as the original net/http proxy handler.
 // What's different, is that it has an added feature which receives a custom host to forward.
 // Also, sets the common reverse proxy headers, X-Forwarded-Host and X-Real-IP.
-func proxyHandler(target *url.URL, originalHost string, realIp string) *httputil.ReverseProxy {
+func proxyHandler(target *url.URL, originalHost string, realIp string, logger *golog.Logger) *httputil.ReverseProxy {
 	targetQuery := target.RawQuery
 	director := func(req *http.Request) {
 		req.URL.Scheme = target.Scheme
@@ -142,6 +167,13 @@ func proxyHandler(target *url.URL, originalHost string, realIp string) *httputil
 			req.URL.RawQuery = targetQuery + "&" + req.URL.RawQuery
 		}
 
+		if req.Header.Get("Connection") == "upgrade" {
+			req.Header.Set("Connection", "Upgrade")
+		}
+
+		logger.Infof("Connection header: %s", req.Header.Get("Connection"))
+		logger.Infof("Upgrade header: %s", req.Header.Get("Upgrade"))
+
 		if _, ok := req.Header["User-Agent"]; !ok {
 			// explicitly disable User-Agent so it's not set to default value
 			req.Header.Set("User-Agent", "")
@@ -149,12 +181,10 @@ func proxyHandler(target *url.URL, originalHost string, realIp string) *httputil
 	}
 	p := &httputil.ReverseProxy{Director: director}
 
-	if netutil.IsLoopbackHost(target.Host) {
-		transport := &http.Transport{
-			TLSClientConfig: &tls.Config{InsecureSkipVerify: true},
-		}
-		p.Transport = transport
+	transport := &http.Transport{
+		TLSClientConfig: &tls.Config{InsecureSkipVerify: true},
 	}
+	p.Transport = transport
 
 	return p
 }

@@ -15,6 +15,7 @@ RUN go get -v -u golang.org/x/crypto/bcrypt
 RUN go get -v -u github.com/iris-contrib/middleware/raven
 RUN go get -v -u github.com/elastic/apm-agent-go
 RUN go get -v -u github.com/go-redis/redis
+RUN go get -v -u github.com/gorilla/websocket
 
 COPY . .
 
