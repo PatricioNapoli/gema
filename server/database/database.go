@@ -5,6 +5,7 @@ import (
 
 	"github.com/go-pg/pg"
 	"github.com/go-pg/pg/orm"
+	"gema/server/utils"
 )
 
 type Database struct {
@@ -17,9 +18,7 @@ func New(sql *pg.DB) *Database {
 	}
 
 	err := d.migrate()
-	if err != nil {
-		panic(err)
-	}
+	utils.Handle(err)
 
 	return d
 }
@@ -30,9 +29,7 @@ func (s *Database) Dispose() {
 
 func (s *Database) IsFirstLogin() bool {
 	count, err := s.SQL.Model((*models.User)(nil)).Count()
-	if err != nil {
-		panic(err)
-	}
+	utils.Handle(err)
 	return count == 0
 }
 
@@ -41,9 +38,7 @@ func (s *Database) migrate() error {
 		err := s.SQL.CreateTable(model, &orm.CreateTableOptions{
 			IfNotExists: true,
 		})
-		if err != nil {
-			return err
-		}
+		utils.Handle(err)
 	}
 	return nil
 }

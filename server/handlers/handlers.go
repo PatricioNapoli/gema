@@ -5,13 +5,14 @@ import (
 	"gema/server/security"
 	"gema/server/views"
 
-	"github.com/kataras/iris"
-	"gema/server/services"
 	"fmt"
+	"gema/server/services"
+
+	"github.com/kataras/iris"
 )
 
 type Handlers struct {
-	Services *services.Services
+	Services  *services.Services
 	Dashboard *Dashboard
 }
 
@@ -26,12 +27,6 @@ func New(services *services.Services) *Handlers {
 
 type health struct {
 	Status string
-}
-
-func (s *Handlers) Health(ctx iris.Context) {
-	ctx.JSON(&health{
-		Status: "OK",
-	})
 }
 
 func (s *Handlers) LoginPost(ctx iris.Context) {

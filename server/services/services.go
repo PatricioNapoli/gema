@@ -10,14 +10,17 @@ import (
 	"github.com/kataras/iris/sessions"
 	irisRedis "github.com/kataras/iris/sessions/sessiondb/redis"
 	"github.com/kataras/iris/sessions/sessiondb/redis/service"
+	"github.com/elastic/apm-agent-go"
 )
 
 type Services struct {
 	Database *database.Database
 	NoSQL    *redis.Client
 	Session  *sessions.Sessions
+	Tracing *elasticapm.Tracer
 }
 
+// Creates a new Services object containing all the services needed for operating with environment.
 func New() *Services {
 	r := irisRedis.New(service.Config{
 		Network:     "tcp",
@@ -51,6 +54,7 @@ func New() *Services {
 		Database: d,
 		NoSQL:    rc,
 		Session:  s,
+		Tracing: elasticapm.DefaultTracer,
 	}
 }
 

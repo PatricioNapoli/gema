@@ -53,7 +53,7 @@ ID for Grafana dashboard: 1860.
 Use DNSMASQ for wildcard localhost subdomain resolution, like *.localhost.
 Add to /etc/dnsmasq.conf:
 
-`address=/.local/127.0.0.1`
+`address=/.localhost/127.0.0.1`
 
 ## Running
 
@@ -65,13 +65,19 @@ Setup main node label.
 Afterwards:  
 
 `docker swarm init`  
-`./deploy.sh`  
+`./deploy.sh`
+
+## Chat
+
+`mkdir -pv ./chat/volumes/app/mattermost/{data,logs,config,plugins}`  
+`sudo chown -R 2000:2000 ./chat/volumes/app/mattermost/`  
 
 ## TODO
 
 * Internal proxy auth, create dashboard for creating users. These users work for the HQ and the internal services, limit access to kibana.
 * Cluster redis and postgres for data redundancy.
 * GEMA dashboard, hq.geminis.io, live ops, reports generation, ML, message broadcast through WS, push notifications, service routings, let client have a user
+* CORS
 
 * Unit test GEMA
 * Setup Gitlab yml CI/CD, Trigger SonarQube with Gitlab Push

@@ -1,3 +1,5 @@
+#!/bin/sh
+
 apt-get update
 apt-get -y install curl git fail2ban
 

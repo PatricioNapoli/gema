@@ -4,14 +4,17 @@ import (
 	"gema/server/handlers"
 	"gema/server/services"
 	"gema/server/utils"
+
 	"github.com/kataras/iris"
 )
 
+// Wrapper with Application pointer and services.
 type Server struct {
 	App      *iris.Application
 	Handlers *handlers.Handlers
 }
 
+// Creates a new server which serves the HQ operations.
 func New(app *iris.Application, services *services.Services) *Server {
 	app.Logger().Info("Setting up GEMA server.")
 
@@ -21,7 +24,7 @@ func New(app *iris.Application, services *services.Services) *Server {
 	utils.RegisterErrorHandlers(app)
 
 	server := &Server{
-		App: app,
+		App:      app,
 		Handlers: handlers.New(services),
 	}
 
@@ -45,7 +48,6 @@ func (s *Server) setupRoutes() {
 
 	s.App.Get("/", s.Handlers.Dashboard.HQ)
 
-	s.App.Get("/health", s.Handlers.Health)
 	s.App.Post("/login", s.Handlers.LoginPost)
 	s.App.Get("/setup", s.Handlers.SetupGet)
 	s.App.Post("/setup", s.Handlers.SetupPost)
@@ -53,4 +55,3 @@ func (s *Server) setupRoutes() {
 	dashRoute := s.App.Party("/dash")
 	dashRoute.Get("/view", s.Handlers.Dashboard.HQ)
 }
-

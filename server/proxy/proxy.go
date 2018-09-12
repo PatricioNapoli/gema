@@ -10,7 +10,6 @@ import (
 	"os"
 	"strings"
 
-	"github.com/elastic/apm-agent-go"
 	"github.com/go-redis/redis"
 	"github.com/kataras/iris"
 	"github.com/kataras/iris/core/netutil"
@@ -29,11 +28,13 @@ var (
 	}
 )
 
+// Wrapper with Application pointer and services.
 type Proxy struct {
 	App *iris.Application
 	Services *services.Services
 }
 
+// Creates a new Proxy which receives the requests and proxies them based on the config found in redis.
 func New(app *iris.Application, services *services.Services) *Proxy {
 	app.Logger().Info("Setting up GEMA reverse proxy.")
 
@@ -65,11 +66,11 @@ func (s *Proxy) Start(addr string) {
 func (s *Proxy) setupRoutes() {
 	s.App.Logger().Info("Setting up reverse proxy handlers.")
 
-	s.App.Handle("ALL", "*", s.Proxy)
+	s.App.Handle("ALL", "*", s.proxy)
 
 	// WebDAV hack
 	for _, method := range WebDAVMethods {
-		s.App.Handle(method, "*", s.Proxy)
+		s.App.Handle(method, "*", s.proxy)
 	}
 }
 
@@ -83,7 +84,7 @@ type service struct {
 	Path      string `json:"path"`
 }
 
-func (s *Proxy) Proxy(ctx iris.Context) {
+func (s *Proxy) proxy(ctx iris.Context) {
 	session := s.Services.Session.Start(ctx)
 
 	if ctx.Host() == os.Getenv("HQ_DOMAIN") {
@@ -103,7 +104,7 @@ func (s *Proxy) Proxy(ctx iris.Context) {
 	utils.FromJSON([]byte(svc), &serv)
 
 	if session.GetBooleanDefault("authorized", false) || serv.Auth == "0" {
-		tx := elasticapm.DefaultTracer.StartTransaction(fmt.Sprintf("%s %s%s", ctx.Method(), ctx.Host(), ctx.Path()), "proxy")
+		tx := s.Services.Tracing.StartTransaction(fmt.Sprintf("%s %s%s", ctx.Method(), ctx.Host(), ctx.Path()), "proxy")
 		defer tx.End()
 
 		port := ":80"
@@ -122,6 +123,10 @@ func (s *Proxy) Proxy(ctx iris.Context) {
 	ctx.Redirect(fmt.Sprintf("https://%s/?next=%s", os.Getenv("HQ_DOMAIN"), ctx.Host()))
 }
 
+
+// This proxy handler has almost the same functionalty as the original net/http proxy handler.
+// What's different, is that it has an added feature which receives a custom host to forward.
+// Also, sets the common reverse proxy headers, X-Forwarded-Host and X-Real-IP.
 func proxyHandler(target *url.URL, originalHost string, realIp string) *httputil.ReverseProxy {
 	targetQuery := target.RawQuery
 	director := func(req *http.Request) {
@@ -154,6 +159,7 @@ func proxyHandler(target *url.URL, originalHost string, realIp string) *httputil
 	return p
 }
 
+// Added here because it was private in net/http.
 func singleJoiningSlash(a, b string) string {
 	aslash := strings.HasSuffix(a, "/")
 	bslash := strings.HasPrefix(b, "/")

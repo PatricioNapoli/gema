@@ -8,16 +8,16 @@ services:
     environment:
       ELASTIC_APM_SERVER_URL: http://goapm:8200
       ELASTIC_APM_SERVICE_NAME: gema-proxy
-      ELASTIC_APM_ENVIRONMENT: $ENVIRONMENT
     deploy:
-      mode: global
+      mode: replicated
+      replicas: 1
       restart_policy:
         condition: on-failure
         delay: 5s
         max_attempts: 3
         window: 120s
     healthcheck:
-      test: wget --quiet --tries=1 --spider 127.0.0.1:81/health || exit 1
+      test: wget --quiet --tries=1 --spider 127.0.0.1:81 || exit 1
       interval: 5s
       timeout: 10s
       retries: 3
@@ -25,8 +25,8 @@ services:
         - gema
     volumes:      
       - ./templates:/go/bin/templates
-      - nginx_static:/static
       - ./:/go/src/gema/server
+      - nginx_static:/static
 
 networks:
   gema:

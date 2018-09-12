@@ -64,9 +64,7 @@ func logSkipper(ctx iris.Context) bool {
 	// Ignore static files
 	matched, err := regexp.MatchString(`.+\..{2,5}.*$`, ctx.Path())
 
-	if err != nil {
-		panic(err)
-	}
+	Handle(err)
 
 	return matched
 }

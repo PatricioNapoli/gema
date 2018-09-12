@@ -1,3 +1,5 @@
+#!/bin/sh
+
 echo "Deploying GEMA..."
 
 docker stack deploy --compose-file=cloud-compose.yml cloud

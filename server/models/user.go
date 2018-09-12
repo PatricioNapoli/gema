@@ -2,6 +2,7 @@ package models
 
 import (
 	"github.com/go-pg/pg"
+	"gema/server/utils"
 )
 
 type User struct {
@@ -13,14 +14,14 @@ type User struct {
 	Hash  string
 }
 
+// Fetches the user based on an email filter, returns nil if not found.
 func FetchUserByEmail(db *pg.DB, email string) *User {
 	user := &User{}
 	err := db.Model(user).Where("email = ?", email).Select()
 	if err == pg.ErrNoRows {
 		return nil
-	} else if err != nil {
-		panic(err)
 	}
+	utils.Handle(err)
 
 	return user
 }

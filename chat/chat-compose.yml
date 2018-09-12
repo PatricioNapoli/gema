@@ -1,0 +1,42 @@
+version: "3.7"
+
+services:
+  chat:
+    image: localhost:5000/gema/chat
+    env_file:
+      - ../.env
+    environment:
+      DB_HOST: postgres
+      MM_DBNAME: gema_mm
+    labels:
+      gema.service: chat
+      gema.auth: 1
+      gema.port: 8000
+      gema.subdomain: chat
+    deploy:
+      mode: replicated
+      replicas: 1
+      restart_policy:
+        condition: on-failure
+        delay: 5s
+        max_attempts: 3
+        window: 120s
+    healthcheck: 
+      test: curl --fail http://localhost:8000 || exit 1
+      interval: 5s
+      timeout: 10s
+      retries: 3
+    networks:
+        - gema
+    volumes:
+      - ./volumes/app/mattermost/config:/mattermost/config:rw
+      - ./volumes/app/mattermost/data:/mattermost/data:rw
+      - ./volumes/app/mattermost/logs:/mattermost/logs:rw
+      - ./volumes/app/mattermost/plugins:/mattermost/plugins:rw
+      - /etc/localtime:/etc/localtime:ro
+
+
+networks:
+  gema:
+    external: true
+
