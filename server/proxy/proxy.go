@@ -113,13 +113,8 @@ func (s *Proxy) proxy(ctx iris.Context) {
 		}
 
 		proto := serv.Proto
-		if ctx.Method() == "CONNECT" {
-			if proto == "http" {
-				proto = "ws"
-			} else {
-				s.App.Logger().Info("Setting protocol.")
-				proto = "wss"
-			}
+		if ctx.Request().Header.Get("Connection") == "upgrade" {
+			proto = "ws"
 		}
 
 		route := fmt.Sprintf("%s://%s%s%s", proto, serv.Name, port, serv.Path)
@@ -127,17 +122,10 @@ func (s *Proxy) proxy(ctx iris.Context) {
 		target, _ := url.Parse(route)
 
 		// Handle WS
-		if ctx.Method() == "CONNECT" {
-			s.App.Logger().Info("Handling connect.")
-			wsProxy := NewWebSocketProxy(target)
+		if ctx.Request().Header.Get("Connection") == "upgrade" {
+			wsProxy := NewWebSocketProxy(target, ctx.Host())
 			wsProxy.ServeHTTP(ctx.ResponseWriter(), ctx.Request())
 			return
-		}
-
-		if ctx.GetHeader("Upgrade") == "websocket" {
-			s.App.Logger().Info("Handling upgrade.")
-			ctx.Request().Header.Set("Connection", "upgrade")
-			ctx.Request().Header.Set("Upgrade", "websocket")
 		}
 
 		proxy := proxyHandler(target, ctx.Host(), ctx.GetHeader("X-Real-IP"), s.App.Logger())
@@ -165,10 +153,6 @@ func proxyHandler(target *url.URL, originalHost string, realIp string, logger *g
 			req.URL.RawQuery = targetQuery + req.URL.RawQuery
 		} else {
 			req.URL.RawQuery = targetQuery + "&" + req.URL.RawQuery
-		}
-
-		if req.Header.Get("Connection") == "upgrade" {
-			req.Header.Set("Connection", "Upgrade")
 		}
 
 		logger.Infof("Connection header: %s", req.Header.Get("Connection"))

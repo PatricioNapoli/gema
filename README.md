@@ -77,8 +77,11 @@ Afterwards:
 * Internal proxy auth, create dashboard for creating users. These users work for the HQ and the internal services, limit access to kibana.
 * Cluster redis and postgres for data redundancy.
 * GEMA dashboard, hq.geminis.io, live ops, reports generation, ML, message broadcast through WS, push notifications, service routings, let client have a user
-* CORS
+* CORS.
+* Check Performance of Proxy.
+* Disable services logins.
 
+* Code Documentation, Wiki.js vs BookStack
 * Unit test GEMA
 * Setup Gitlab yml CI/CD, Trigger SonarQube with Gitlab Push
 * Define /health for services, (HEALTHCHECK dockerfile) GEMA Dashboard should test those for health.

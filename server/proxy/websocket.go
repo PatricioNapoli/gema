@@ -44,15 +44,18 @@ type WebsocketProxy struct {
 	//  Dialer contains options for connecting to the backend WebSocket server.
 	//  If nil, DefaultDialer is used.
 	Dialer *websocket.Dialer
+
+	// Original requested URL
+	RealHost string
 }
 
 // ProxyHandler returns a new http.Handler interface that reverse proxies the
 // request to the given target.
-func ProxyHandler(target *url.URL) http.Handler { return NewWebSocketProxy(target) }
+func ProxyHandler(target *url.URL, realHost string) http.Handler { return NewWebSocketProxy(target, realHost) }
 
 // NewProxy returns a new Websocket reverse proxy that rewrites the
 // URL's to the scheme, host and base path provider in target.
-func NewWebSocketProxy(target *url.URL) *WebsocketProxy {
+func NewWebSocketProxy(target *url.URL, realHost string) *WebsocketProxy {
 	backend := func(r *http.Request) *url.URL {
 		// Shallow copy
 		u := *target
@@ -61,7 +64,7 @@ func NewWebSocketProxy(target *url.URL) *WebsocketProxy {
 		u.RawQuery = r.URL.RawQuery
 		return &u
 	}
-	return &WebsocketProxy{Backend: backend}
+	return &WebsocketProxy{Backend: backend, RealHost: realHost}
 }
 
 // ServeHTTP implements the http.Handler that proxies WebSocket connections.
@@ -73,6 +76,7 @@ func (w *WebsocketProxy) ServeHTTP(rw http.ResponseWriter, req *http.Request) {
 	}
 
 	backendURL := w.Backend(req)
+	log.Println(backendURL.String())
 	if backendURL == nil {
 		log.Println("websocketproxy: backend URL is nil")
 		http.Error(rw, "internal server error (code: 2)", http.StatusInternalServerError)
@@ -88,7 +92,7 @@ func (w *WebsocketProxy) ServeHTTP(rw http.ResponseWriter, req *http.Request) {
 	// the final destinations.
 	requestHeader := http.Header{}
 	if origin := req.Header.Get("Origin"); origin != "" {
-		requestHeader.Add("Origin", origin)
+		requestHeader.Set("Origin", origin)
 	}
 	for _, prot := range req.Header[http.CanonicalHeaderKey("Sec-WebSocket-Protocol")] {
 		requestHeader.Add("Sec-WebSocket-Protocol", prot)
@@ -110,6 +114,9 @@ func (w *WebsocketProxy) ServeHTTP(rw http.ResponseWriter, req *http.Request) {
 		}
 		requestHeader.Set("X-Forwarded-For", clientIP)
 	}
+
+	requestHeader.Set("Host", w.RealHost)
+	requestHeader.Set("X-Forwarded-Host", w.RealHost)
 
 	// Set the originating protocol of the incoming HTTP request. The SSL might
 	// be terminated on our site and because we doing proxy adding this would

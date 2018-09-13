@@ -9,7 +9,6 @@ services:
       - /var/run/docker.sock:/var/run/docker.sock
       - /var/lib/docker/volumes:/var/lib/docker/volumes
     networks:
-      - portainer
       - gema
     deploy:
       mode: global
@@ -25,15 +24,13 @@ services:
       gema.service: portainer
       gema.auth: 1
       gema.port: 9000
-      gema.proto: https
       gema.subdomain: portainer
-    command: -H tcp://tasks.portainer-agent:9001 --ssl --sslcert /certs/domain.crt --sslkey /certs/domain.key
+    command: -H tcp://tasks.portainer-agent:9001 --no-auth
     networks:
-      - portainer
       - gema
     volumes:
       - portainer_data:/data
-      - ../certs:/certs
+      # - ../certs:/certs --ssl --sslcert /certs/domain.crt --sslkey /certs/domain.key
     deploy:
       mode: replicated
       replicas: 1
@@ -88,8 +85,5 @@ volumes:
   redis_data:
 
 networks:
-  portainer:
-    driver: overlay
-    attachable: true
   gema:
     external: true
