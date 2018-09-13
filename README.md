@@ -80,6 +80,7 @@ Afterwards:
 * CORS.
 * Check Performance of Proxy.
 * Disable services logins.
+* Disable retina detect particle js
 
 * Code Documentation, Wiki.js vs BookStack
 * Unit test GEMA
