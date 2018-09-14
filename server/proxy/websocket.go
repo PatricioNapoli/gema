@@ -47,15 +47,14 @@ type WebsocketProxy struct {
 
 	// Original requested URL
 	RealHost string
-}
 
-// ProxyHandler returns a new http.Handler interface that reverse proxies the
-// request to the given target.
-func ProxyHandler(target *url.URL, realHost string) http.Handler { return NewWebSocketProxy(target, realHost) }
+	// Original IP
+	RealIp string
+}
 
 // NewProxy returns a new Websocket reverse proxy that rewrites the
 // URL's to the scheme, host and base path provider in target.
-func NewWebSocketProxy(target *url.URL, realHost string) *WebsocketProxy {
+func NewWebSocketProxy(target *url.URL, realHost string, realIp string) *WebsocketProxy {
 	backend := func(r *http.Request) *url.URL {
 		// Shallow copy
 		u := *target
@@ -64,7 +63,7 @@ func NewWebSocketProxy(target *url.URL, realHost string) *WebsocketProxy {
 		u.RawQuery = r.URL.RawQuery
 		return &u
 	}
-	return &WebsocketProxy{Backend: backend, RealHost: realHost}
+	return &WebsocketProxy{Backend: backend, RealHost: realHost, RealIp: realIp}
 }
 
 // ServeHTTP implements the http.Handler that proxies WebSocket connections.
@@ -116,6 +115,7 @@ func (w *WebsocketProxy) ServeHTTP(rw http.ResponseWriter, req *http.Request) {
 	}
 
 	requestHeader.Set("Host", w.RealHost)
+	requestHeader.Set("X-Real-IP", w.RealIp)
 	requestHeader.Set("X-Forwarded-Host", w.RealHost)
 
 	// Set the originating protocol of the incoming HTTP request. The SSL might

@@ -10,24 +10,15 @@ import (
 	"github.com/go-redis/redis"
 )
 
-type Service struct {
-	Name      string `json:"name"`
-	Proto     string `json:"proto"`
-	Port      string `json:"port"`
-	Auth      string `json:"auth"`
-	Domain    string `json:"domain"`
-	SubDomain string `json:"subdomain"`
-	Path      string `json:"path"`
-}
-
 type Attributes struct {
-	Name      string `json:"gema.service"`
-	Proto     string `json:"gema.proto"`
-	Port      string `json:"gema.port"`
-	Auth      string `json:"gema.auth"`
-	Domain    string `json:"gema.domain"`
-	SubDomain string `json:"gema.subdomain"`
-	Path      string `json:"gema.path"`
+	Name        string `json:"gema.service"`
+	Proto       string `json:"gema.proto"`
+	Port        string `json:"gema.port"`
+	Auth        string `json:"gema.auth"`
+	AccessLevel string `json:gema.access_level`
+	Domain      string `json:"gema.domain"`
+	SubDomain   string `json:"gema.subdomain"`
+	Path        string `json:"gema.path"`
 }
 
 func DefaultEvent() *Event {
@@ -35,27 +26,16 @@ func DefaultEvent() *Event {
 		Status: "create",
 		Actor: Actor{
 			Attributes: Attributes{
-				Name:      "",
-				Proto:     "http",
-				Port:      "",
-				Auth:      "0",
-				Domain:    "",
-				SubDomain: "",
-				Path:      "/",
+				Name:        "",
+				Proto:       "http",
+				Port:        "",
+				Auth:        "0",
+				AccessLevel: "0",
+				Domain:      "",
+				SubDomain:   "",
+				Path:        "/",
 			},
 		},
-	}
-}
-
-func convertToService(attr Attributes) Service {
-	return Service{
-		Name:      attr.Name,
-		Proto:     attr.Proto,
-		Port:      attr.Port,
-		Auth:      attr.Auth,
-		Domain:    attr.Domain,
-		SubDomain: attr.SubDomain,
-		Path:      attr.Path,
 	}
 }
 
@@ -87,23 +67,21 @@ func (h *Handler) HandleEvent(ev *Event) {
 
 	evService := ev.Actor.Attributes
 
-	svc := convertToService(evService)
+	j := string(utils.ToJSON(evService))
 
-	j := string(utils.ToJSON(svc))
-
-	route := getRoute(svc)
+	route := getRoute(evService)
 
 	err := h.Database.Set(fmt.Sprintf("service:%s", route), j, 0).Err()
 	utils.Handle(err)
 
-	log.Printf("Created route: %s for service: %s", route, svc.Name)
+	log.Printf("Created route: %s for service: %s", route, evService.Name)
 }
 
-func getRoute(svc Service) string {
+func getRoute(svc Attributes) string {
 	route := ""
 
 	stg := ""
-	if os.Getenv("ENVIRONMENT") == "STAGING" {
+	if os.Getenv("ENVIRONMENT") == "stg" {
 		stg = "stg."
 	}
 
@@ -118,7 +96,7 @@ func getRoute(svc Service) string {
 		route = fmt.Sprintf("%s%s", sub, os.Getenv("HQ_DOMAIN"))
 	}
 
-	if os.Getenv("ENVIRONMENT") == "DEVELOPMENT" {
+	if os.Getenv("ENVIRONMENT") == "dev" {
 		hq := "hq."
 		if svc.Domain != "" {
 			hq = svc.Domain + "."

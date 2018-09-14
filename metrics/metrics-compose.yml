@@ -31,6 +31,11 @@ services:
 
   grafana:
     image: grafana/grafana
+    environment:
+      - GF_AUTH_ANONYMOUS_ENABLED=true
+      - GF_AUTH_ANONYMOUS_ORG_NAME=Geminis
+      - GF_AUTH_ANONYMOUS_ORG_ROLE=Admin
+      - GF_USERS_ALLOW_SIGN_UP=false
     labels:
       gema.service: grafana
       gema.auth: 1

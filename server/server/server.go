@@ -46,6 +46,10 @@ func (s Server) Start(addr string) {
 func (s *Server) setupRoutes() {
 	s.App.Logger().Info("Setting up routes.")
 
+	s.App.Get("/health", func(ctx iris.Context){
+		ctx.WriteString("OK\n")
+	})
+
 	s.App.Get("/", s.Handlers.Dashboard.HQ)
 
 	s.App.Post("/login", s.Handlers.LoginPost)

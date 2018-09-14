@@ -17,7 +17,7 @@ services:
         max_attempts: 3
         window: 120s
     healthcheck:
-      test: wget --quiet --tries=1 --spider 127.0.0.1:81 || exit 1
+      test: wget --quiet --tries=1 --spider 127.0.0.1:81/health || exit 1
       interval: 5s
       timeout: 10s
       retries: 3

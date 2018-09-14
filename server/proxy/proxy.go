@@ -1,19 +1,15 @@
 package proxy
 
 import (
-	"crypto/tls"
 	"fmt"
 	"gema/server/utils"
-	"net/http"
-	"net/http/httputil"
 	"net/url"
 	"os"
-	"strings"
+
+	"gema/server/services"
 
 	"github.com/go-redis/redis"
 	"github.com/kataras/iris"
-	"gema/server/services"
-	"github.com/kataras/golog"
 )
 
 var (
@@ -30,7 +26,7 @@ var (
 
 // Wrapper with Application pointer and services.
 type Proxy struct {
-	App *iris.Application
+	App      *iris.Application
 	Services *services.Services
 }
 
@@ -44,7 +40,7 @@ func New(app *iris.Application, services *services.Services) *Proxy {
 	utils.RegisterErrorHandlers(app)
 
 	proxy := &Proxy{
-		App: app,
+		App:      app,
 		Services: services,
 	}
 
@@ -75,13 +71,14 @@ func (s *Proxy) setupRoutes() {
 }
 
 type service struct {
-	Name      string `json:"name"`
-	Proto     string `json:"proto"`
-	Port      string `json:"port"`
-	Auth      string `json:"auth"`
-	Domain    string `json:"domain"`
-	SubDomain string `json:"subdomain"`
-	Path      string `json:"path"`
+	Name        string `json:"gema.service"`
+	Proto       string `json:"gema.proto"`
+	Port        string `json:"gema.port"`
+	Auth        string `json:"gema.auth"`
+	AccessLevel string `json:"gema.access_level"`
+	Domain      string `json:"gema.domain"`
+	SubDomain   string `json:"gema.subdomain"`
+	Path        string `json:"gema.path"`
 }
 
 func (s *Proxy) proxy(ctx iris.Context) {
@@ -89,7 +86,7 @@ func (s *Proxy) proxy(ctx iris.Context) {
 
 	if ctx.Host() == os.Getenv("HQ_DOMAIN") {
 		target, _ := url.Parse("http://localhost:81/")
-		proxy := proxyHandler(target, ctx.Host(), ctx.GetHeader("X-Real-IP"), s.App.Logger())
+		proxy := NewHTTPProxy(target, ctx.Host(), ctx.GetHeader("X-Real-IP"))
 		proxy.ServeHTTP(ctx.ResponseWriter(), ctx.Request())
 		return
 	}
@@ -121,67 +118,17 @@ func (s *Proxy) proxy(ctx iris.Context) {
 
 		target, _ := url.Parse(route)
 
-		// Handle WS
+		// Handle WebSocket
 		if ctx.Request().Header.Get("Connection") == "upgrade" {
-			wsProxy := NewWebSocketProxy(target, ctx.Host())
+			wsProxy := NewWebSocketProxy(target, ctx.Host(), ctx.GetHeader("X-Real-IP"))
 			wsProxy.ServeHTTP(ctx.ResponseWriter(), ctx.Request())
 			return
 		}
 
-		proxy := proxyHandler(target, ctx.Host(), ctx.GetHeader("X-Real-IP"), s.App.Logger())
+		proxy := NewHTTPProxy(target, ctx.Host(), ctx.GetHeader("X-Real-IP"))
 		proxy.ServeHTTP(ctx.ResponseWriter(), ctx.Request())
 		return
 	}
 
 	ctx.Redirect(fmt.Sprintf("https://%s/?next=%s", os.Getenv("HQ_DOMAIN"), ctx.Host()))
-}
-
-
-// This proxy handler has almost the same functionalty as the original net/http proxy handler.
-// What's different, is that it has an added feature which receives a custom host to forward.
-// Also, sets the common reverse proxy headers, X-Forwarded-Host and X-Real-IP.
-func proxyHandler(target *url.URL, originalHost string, realIp string, logger *golog.Logger) *httputil.ReverseProxy {
-	targetQuery := target.RawQuery
-	director := func(req *http.Request) {
-		req.URL.Scheme = target.Scheme
-		req.URL.Host = target.Host
-		req.Host = originalHost
-		req.Header.Set("X-Forwarded-Host", originalHost)
-		req.Header.Set("X-Real-IP", realIp)
-		req.URL.Path = singleJoiningSlash(target.Path, req.URL.Path)
-		if targetQuery == "" || req.URL.RawQuery == "" {
-			req.URL.RawQuery = targetQuery + req.URL.RawQuery
-		} else {
-			req.URL.RawQuery = targetQuery + "&" + req.URL.RawQuery
-		}
-
-		logger.Infof("Connection header: %s", req.Header.Get("Connection"))
-		logger.Infof("Upgrade header: %s", req.Header.Get("Upgrade"))
-
-		if _, ok := req.Header["User-Agent"]; !ok {
-			// explicitly disable User-Agent so it's not set to default value
-			req.Header.Set("User-Agent", "")
-		}
-	}
-	p := &httputil.ReverseProxy{Director: director}
-
-	transport := &http.Transport{
-		TLSClientConfig: &tls.Config{InsecureSkipVerify: true},
-	}
-	p.Transport = transport
-
-	return p
-}
-
-// Added here because it was private in net/http.
-func singleJoiningSlash(a, b string) string {
-	aslash := strings.HasSuffix(a, "/")
-	bslash := strings.HasPrefix(b, "/")
-	switch {
-	case aslash && bslash:
-		return a + b[1:]
-	case !aslash && !bslash:
-		return a + "/" + b
-	}
-	return a + b
 }

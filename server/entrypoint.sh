@@ -1,6 +1,6 @@
 #!/bin/sh
 
-if [ "$ENVIRONMENT" != "DEVELOPMENT" ]; then
+if [ "$ENVIRONMENT" != "dev" ]; then
     cp -a /go/src/gema/server/static/. /static/
     gema-server
 else

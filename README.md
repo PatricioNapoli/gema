@@ -28,8 +28,10 @@ Using the following environment:
 * MetricBeat
 
 ## Generating a self signed certificate.
-`sudo openssl req -x509 -nodes -days 365 -newkey rsa:2048 -keyout ./certs/domain.key -out ./certs/domain.crt`  
-`sudo openssl dhparam -out ./certs/dhparam.pem 2048`
+```
+sudo openssl req -x509 -nodes -days 365 -newkey rsa:2048 -keyout ./certs/domain.key -out ./certs/domain.crt` 
+sudo openssl dhparam -out ./certs/dhparam.pem 2048
+```
 
 ## Auth for Registry
 `auth/htpasswd`  
@@ -39,38 +41,50 @@ Use htpasswd online generator, bcrypt algorithm.
 Setup preset.env into .env.  
 
 Need to migrate dashboards from metricbeat and filebeat after deploying.  
-SSH to metricbeat and filebeat containers and run `./metricbeat setup -e -strict.perms=false -E setup.kibana.host=kibana:5601`.  
+SSH to metricbeat and filebeat containers and run 
 
-Create databases gema_nc and gema_sentry.  
+```
+./metricbeat setup -e -strict.perms=false -E setup.kibana.host=kibana:5601
+```
 
-SSH to sentry and run ./entrypoint.sh upgrade.  
+Login to pgadmin and run the SQL in `databases.sql`
 
-Login to cloud and run migration from admin.  
+SSH to sentry and run `./entrypoint.sh upgrade`
 
-ID for Grafana dashboard: 1860.  
+Login to cloud and run migration from admin.
+
+ID for Grafana dashboard: 1860.
 
 ## Localhost resolution
 Use DNSMASQ for wildcard localhost subdomain resolution, like *.localhost.
 Add to /etc/dnsmasq.conf:
 
-`address=/.localhost/127.0.0.1`
+```
+address=/.localhost/127.0.0.1
+```
 
 ## Running
 
 Setup sysctl map count if needed. (see node-init.sh)  
 Setup main node label.  
 
-`docker node update --label-add category=main <HOSTNAME>`  
+```
+docker node update --label-add category=main <HOSTNAME>
+```
 
 Afterwards:  
 
-`docker swarm init`  
-`./deploy.sh`
+```
+docker swarm init
+./deploy.sh
+```
 
 ## Chat
 
-`mkdir -pv ./chat/volumes/app/mattermost/{data,logs,config,plugins}`  
-`sudo chown -R 2000:2000 ./chat/volumes/app/mattermost/`  
+```
+mkdir -pv ./chat/volumes/app/mattermost/{data,logs,config,plugins}
+sudo chown -R 2000:2000 ./chat/volumes/app/mattermost/
+```
 
 ## TODO
 
@@ -79,8 +93,8 @@ Afterwards:
 * GEMA dashboard, hq.geminis.io, live ops, reports generation, ML, message broadcast through WS, push notifications, service routings, let client have a user
 * CORS.
 * Check Performance of Proxy.
-* Disable services logins.
-* Disable retina detect particle js
+* Apache Spark
+* H20.ai
 
 * Code Documentation, Wiki.js vs BookStack
 * Unit test GEMA

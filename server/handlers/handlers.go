@@ -25,10 +25,6 @@ func New(services *services.Services) *Handlers {
 	}
 }
 
-type health struct {
-	Status string
-}
-
 func (s *Handlers) LoginPost(ctx iris.Context) {
 	email := ctx.PostValue("email")
 	password := ctx.PostValue("password")
