@@ -7,7 +7,7 @@ curl -fsSL https://get.docker.com -o get-docker.sh
 sh get-docker.sh
 
 sudo sysctl -w vm.max_map_count=262144
-echo 'vm.max_map_count=262144' >> sudo tee --append /etc/sysctl.conf
+echo 'vm.max_map_count=262144' | sudo tee --append /etc/sysctl.conf
 
 docker swarm init
 docker node update --label-add category=main

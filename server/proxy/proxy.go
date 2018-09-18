@@ -14,6 +14,7 @@ import (
 
 var (
 	WebDAVMethods = [...]string{
+		"REPORT",
 		"COPY",
 		"LOCK",
 		"MKCOL",
