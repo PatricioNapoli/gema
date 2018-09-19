@@ -95,6 +95,8 @@ sudo chown -R 2000:2000 ./chat/volumes/app/mattermost/
 * Check Performance of Proxy.
 * Apache Spark
 * H20.ai
+* Cache service configurations from Redis in memory (Should read redis list in a coroutine, redis events are pushed by agent with expiration, add to processed list.)
+
 
 * Code Documentation, Wiki.js vs BookStack
 * Unit test GEMA
@@ -102,6 +104,7 @@ sudo chown -R 2000:2000 ./chat/volumes/app/mattermost/
 * Define /health for services, (HEALTHCHECK dockerfile) GEMA Dashboard should test those for health.
 * Define logstash log pattern for all services in GEMA for parsing.
 * Use wikis for documentation.
+
 
 * Close logstash UDP port
 
