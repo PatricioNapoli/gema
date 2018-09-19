@@ -104,3 +104,17 @@ particlesJS("particles", {
     "retina_detect": false
 });
 
+function rand(min,max)
+{
+    return Math.floor(Math.random()*(max-min+1)+min);
+}
+
+function makeColor(min, max) {
+    return "rgba(" + rand(min, max) + "," + rand(min, max) + "," + rand(min, max) + ",1)";
+}
+
+let color1 = makeColor(65, 85);
+let color2 = makeColor(45, 65);
+let color3 = makeColor(20, 45);
+
+document.getElementsByTagName("body")[0].style.background = "linear-gradient(0deg, " + color1 + " 0%, " + color2 + " 25%, " + color3 + " 50%, rgba(0,0,20,1) 75%, rgba(0,0,0,1) 100%)";
