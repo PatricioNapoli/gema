@@ -2,6 +2,7 @@ package utils
 
 import (
 	"encoding/json"
+	"time"
 )
 
 func Handle(err error) {
@@ -19,4 +20,10 @@ func ToJSON(v interface{}) []byte {
 func FromJSON(d []byte, v interface{}) {
 	err := json.Unmarshal(d, v)
 	Handle(err)
+}
+
+func DoEvery(d time.Duration, f func()) {
+	for range time.Tick(d) {
+		f()
+	}
 }

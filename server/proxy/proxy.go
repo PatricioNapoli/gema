@@ -8,7 +8,6 @@ import (
 
 	"gema/server/services"
 
-	"github.com/go-redis/redis"
 	"github.com/kataras/iris"
 )
 
@@ -29,6 +28,8 @@ var (
 type Proxy struct {
 	App      *iris.Application
 	Services *services.Services
+
+	routeCache *RouteCache
 }
 
 // Creates a new Proxy which receives the requests and proxies them based on the config found in redis.
@@ -43,6 +44,8 @@ func New(app *iris.Application, services *services.Services) *Proxy {
 	proxy := &Proxy{
 		App:      app,
 		Services: services,
+
+		routeCache: NewRouteCache(services),
 	}
 
 	proxy.setupRoutes()
@@ -92,8 +95,8 @@ func (s *Proxy) proxy(ctx iris.Context) {
 		return
 	}
 
-	svc, err := s.Services.NoSQL.Get(fmt.Sprintf("service:%s", ctx.Host())).Result()
-	if err == redis.Nil {
+	svc := s.routeCache.GetRouteConfig(ctx.Host())
+	if svc == "" {
 		ctx.NotFound()
 		return
 	}

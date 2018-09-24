@@ -4,10 +4,10 @@ import (
 	"fmt"
 	"gema/agent/database"
 	"gema/agent/utils"
+	"github.com/go-redis/redis"
 	"log"
 	"os"
-
-	"github.com/go-redis/redis"
+	"time"
 )
 
 type Attributes struct {
@@ -15,7 +15,7 @@ type Attributes struct {
 	Proto       string `json:"gema.proto"`
 	Port        string `json:"gema.port"`
 	Auth        string `json:"gema.auth"`
-	AccessLevel string `json:gema.access_level`
+	AccessLevel string `json:"gema.access_level"`
 	Domain      string `json:"gema.domain"`
 	SubDomain   string `json:"gema.subdomain"`
 	Path        string `json:"gema.path"`
@@ -52,6 +52,11 @@ type Handler struct {
 	Database *redis.Client
 }
 
+type ConfigRefreshEvent struct {
+	Id string `json:"id"`
+	Service string `json:"service"`
+}
+
 func New() *Handler {
 	return &Handler{
 		Database: database.New(),
@@ -70,11 +75,21 @@ func (h *Handler) HandleEvent(ev *Event) {
 	j := string(utils.ToJSON(evService))
 
 	route := getRoute(evService)
+	key := fmt.Sprintf("service:%s", route)
 
-	err := h.Database.Set(fmt.Sprintf("service:%s", route), j, 0).Err()
+	err := h.Database.Set(key, j, 0).Err()
 	utils.Handle(err)
 
 	log.Printf("Created route: %s for service: %s", route, evService.Name)
+
+	refreshEvent := &ConfigRefreshEvent{
+		Id: string(time.Now().Unix()),
+		Service: key,
+	}
+
+	// Push the config refresh event to redis, set expiration to give time for loading in proxy replicas.
+	h.Database.LPush("service:events", utils.ToJSON(refreshEvent))
+	h.Database.Expire("service:events", 30)
 }
 
 func getRoute(svc Attributes) string {
