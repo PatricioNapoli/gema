@@ -39,7 +39,7 @@ services:
     labels:
       gema.service: grafana
       gema.auth: 1
-      gema.port: 2999
+      gema.port: 3000
       gema.subdomain: grafana
     deploy:
       mode: replicated

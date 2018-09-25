@@ -75,7 +75,6 @@ func (w *WebsocketProxy) ServeHTTP(rw http.ResponseWriter, req *http.Request) {
 	}
 
 	backendURL := w.Backend(req)
-	log.Println(backendURL.String())
 	if backendURL == nil {
 		log.Println("websocketproxy: backend URL is nil")
 		http.Error(rw, "internal server error (code: 2)", http.StatusInternalServerError)

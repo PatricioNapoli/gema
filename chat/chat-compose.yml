@@ -29,12 +29,17 @@ services:
     networks:
         - gema
     volumes:
-      - ./volumes/app/mattermost/config:/mattermost/config:rw
-      - ./volumes/app/mattermost/data:/mattermost/data:rw
-      - ./volumes/app/mattermost/logs:/mattermost/logs:rw
-      - ./volumes/app/mattermost/plugins:/mattermost/plugins:rw
+      - config:/mattermost/config:rw
+      - data:/mattermost/data:rw
+      - logs:/mattermost/logs:rw
+      - plugins:/mattermost/plugins:rw
       - /etc/localtime:/etc/localtime:ro
 
+volumes:
+  config:
+  data:
+  logs:
+  plugins:
 
 networks:
   gema:

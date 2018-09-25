@@ -83,13 +83,13 @@ func (h *Handler) HandleEvent(ev *Event) {
 	log.Printf("Created route: %s for service: %s", route, evService.Name)
 
 	refreshEvent := &ConfigRefreshEvent{
-		Id: string(time.Now().Unix()),
+		Id: fmt.Sprint(time.Now().Unix()),
 		Service: key,
 	}
 
 	// Push the config refresh event to redis, set expiration to give time for loading in proxy replicas.
 	h.Database.LPush("service:events", utils.ToJSON(refreshEvent))
-	h.Database.Expire("service:events", 30)
+	h.Database.Expire("service:events", 30 * time.Second)
 }
 
 func getRoute(svc Attributes) string {

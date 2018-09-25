@@ -5,7 +5,6 @@ import (
 	"gema/server/services"
 	"gema/server/utils"
 	"github.com/go-redis/redis"
-	"log"
 	"time"
 )
 
@@ -38,23 +37,16 @@ type ConfigRefreshEvent struct {
 }
 
 func (rc *RouteCache) configChecker() {
-	log.Print("Test")
-
 	events, err := rc.services.NoSQL.LRange("service:events", 0, -1).Result()
 	if err == redis.Nil {
 		return
 	}
 
-	log.Print("Events size")
-	log.Print(string(len(events)))
-
 	for _, ev := range events {
 		event := &ConfigRefreshEvent{}
 		utils.FromJSON([]byte(ev), event)
 
-		log.Print("Using event from Redis")
-
-		if !rc.processed[event.Id] {
+		if _, exists := rc.processed[event.Id]; !exists {
 			svc, _ := rc.services.NoSQL.Get(event.Service).Result()
 			rc.cache[event.Service] = svc
 			rc.processed[event.Id] = true

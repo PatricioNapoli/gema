@@ -92,10 +92,8 @@ sudo chown -R 2000:2000 ./chat/volumes/app/mattermost/
 * Cluster redis and postgres for data redundancy.
 * GEMA dashboard, hq.geminis.io, live ops, reports generation, ML, message broadcast through WS, push notifications, service routings, let client have a user
 * CORS.
-* Check Performance of Proxy.
 * Apache Spark
 * H20.ai
-* Cache service configurations from Redis in memory (Should read redis list in a coroutine, redis events are pushed by agent with expiration, add to processed list.)
 
 
 * Code Documentation, Wiki.js vs BookStack
