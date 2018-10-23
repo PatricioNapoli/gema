@@ -107,7 +107,7 @@ func (s *Proxy) proxy(ctx iris.Context) {
 	serv := &service{}
 	utils.FromJSON([]byte(svc), &serv)
 
-	if session.GetBooleanDefault("authorized", false) || serv.Auth == "0" {
+	if session.GetBooleanDefault("authenticated", false) || serv.Auth == "0" {
 		port := ":80"
 		if serv.Port != "" {
 			port = fmt.Sprintf(":%s", serv.Port)

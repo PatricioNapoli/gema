@@ -12,6 +12,8 @@ type User struct {
 	Email string
 	Name  string
 	Hash  string
+
+	Groups   []*Group `pg:",many2many:gema_membership"`
 }
 
 // Fetches the user based on an email filter, returns nil if not found.

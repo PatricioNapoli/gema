@@ -20,7 +20,7 @@ func (s *Dashboard) HQ(ctx iris.Context) {
 func (s *Dashboard) requireLogin(ctx iris.Context) {
 	session := s.Services.Session.Start(ctx)
 
-	if session.GetBooleanDefault("authorized", false) {
+	if session.GetBooleanDefault("authenticated", false) {
 		return
 	}
 
@@ -30,3 +30,6 @@ func (s *Dashboard) requireLogin(ctx iris.Context) {
 
 	views.LoginPage(ctx)
 }
+
+// TODO: Logout
+// TODO: Clear another user's session?

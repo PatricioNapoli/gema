@@ -3,9 +3,9 @@ package database
 import (
 	"gema/server/models"
 
+	"gema/server/utils"
 	"github.com/go-pg/pg"
 	"github.com/go-pg/pg/orm"
-	"gema/server/utils"
 )
 
 type Database struct {
@@ -27,18 +27,45 @@ func (s *Database) Dispose() {
 	s.SQL.Close()
 }
 
-func (s *Database) IsFirstLogin() bool {
+func (s *Database) IsFirstUser() bool {
 	count, err := s.SQL.Model((*models.User)(nil)).Count()
 	utils.Handle(err)
 	return count == 0
 }
 
+func (s *Database) IsFirstBoot() bool {
+	count, err := s.SQL.Model((*models.Group)(nil)).Count()
+	utils.Handle(err)
+	return count == 0
+}
+
+func (s *Database) loadInitialData() {
+	groups := []string{"master", "dev", "client"}
+
+	for _, group := range groups {
+		s.SQL.Model(&models.Group{
+			Name: group,
+		}).Insert()
+	}
+}
+
 func (s *Database) migrate() error {
-	for _, model := range []interface{}{(*models.User)(nil)} {
+	tables := []interface{}{
+		(*models.User)(nil),
+		(*models.Group)(nil),
+		(*models.Membership)(nil),
+	}
+
+	for _, model := range tables {
 		err := s.SQL.CreateTable(model, &orm.CreateTableOptions{
 			IfNotExists: true,
 		})
 		utils.Handle(err)
 	}
+
+	if s.IsFirstBoot() {
+		s.loadInitialData()
+	}
+
 	return nil
 }

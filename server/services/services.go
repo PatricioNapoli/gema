@@ -44,7 +44,7 @@ func New() *Services {
 
 	s := sessions.New(sessions.Config{
 		Cookie:       "sessionscookieid",
-		Expires:      0,
+		Expires:      time.Duration(24 * 7) * time.Hour,
 		AllowReclaim: true,
 	})
 

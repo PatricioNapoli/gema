@@ -43,7 +43,7 @@ func (s *Handlers) LoginPost(ctx iris.Context) {
 		ctx.Application().Logger().Infof("%s logged in.", email)
 
 		s := s.Services.Session.Start(ctx)
-		s.Set("authorized", true)
+		s.Set("authenticated", true)
 
 		if ctx.URLParamExists("next") {
 			ctx.Redirect(fmt.Sprintf("https://%s/", ctx.URLParam("next")))
@@ -59,7 +59,7 @@ func (s *Handlers) LoginPost(ctx iris.Context) {
 }
 
 func (s *Handlers) SetupGet(ctx iris.Context) {
-	if !s.Services.Database.IsFirstLogin() {
+	if !s.Services.Database.IsFirstUser() {
 		ctx.Redirect("/")
 		return
 	}
@@ -69,7 +69,7 @@ func (s *Handlers) SetupGet(ctx iris.Context) {
 }
 
 func (s *Handlers) SetupPost(ctx iris.Context) {
-	if !s.Services.Database.IsFirstLogin() {
+	if !s.Services.Database.IsFirstUser() {
 		ctx.Redirect("/")
 		return
 	}
@@ -79,11 +79,17 @@ func (s *Handlers) SetupPost(ctx iris.Context) {
 	password := ctx.PostValue("password")
 	hash := security.GetHash(password)
 
-	s.Services.Database.SQL.Insert(&models.User{
+	var uid int64
+	s.Services.Database.SQL.Model(&models.User{
 		Email: email,
 		Name:  name,
 		Hash:  hash,
-	})
+	}).Returning("id", uid).Insert()
+
+	s.Services.Database.SQL.Model(&models.Membership{
+		UserId: uid,
+		GroupId: models.FetchGroupByName(s.Services.Database.SQL, "master").Id,
+	}).Insert()
 
 	ctx.Application().Logger().Info("Admin account ready.")
 

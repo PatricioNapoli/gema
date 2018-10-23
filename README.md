@@ -88,12 +88,15 @@ sudo chown -R 2000:2000 ./chat/volumes/app/mattermost/
 
 ## TODO
 
-* Internal proxy auth, create dashboard for creating users. These users work for the HQ and the internal services, limit access to kibana.
+* Internal proxy auth, create dashboard for creating users, groups. These users work for the HQ and the internal services, limit access to kibana. In dash show service configs
+* Add user's created at date.
 * Cluster redis and postgres for data redundancy.
 * GEMA dashboard, hq.geminis.io, live ops, reports generation, ML, message broadcast through WS, push notifications, service routings, let client have a user
 * CORS.
 * Apache Spark
 * H20.ai
+* LogSkip internal pages with yml setting
+* Use DSM for PGSQL and Redis cache
 
 
 * Code Documentation, Wiki.js vs BookStack

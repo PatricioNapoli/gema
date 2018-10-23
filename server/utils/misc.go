@@ -2,11 +2,13 @@ package utils
 
 import (
 	"encoding/json"
+	"log"
 	"time"
 )
 
 func Handle(err error) {
 	if err != nil {
+		log.Print(err.Error())
 		panic(err)
 	}
 }
