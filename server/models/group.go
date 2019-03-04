@@ -8,13 +8,16 @@ import (
 type Group struct {
 	TableName struct{} `sql:"gema_groups"`
 
-	Id    	int64
+	BaseModel
+
 	Name 	string
 	Users   []*User `pg:",many2many:gema_membership"`
 }
 
 type Membership struct {
 	TableName struct{} `sql:"gema_membership"`
+
+	BaseModel
 
 	UserId  int64 `sql:",pk"`
 	User    *User

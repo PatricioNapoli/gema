@@ -4,6 +4,7 @@ import (
 	"gema/server/models"
 	"gema/server/security"
 	"gema/server/views"
+	"time"
 
 	"fmt"
 	"gema/server/services"
@@ -42,8 +43,12 @@ func (s *Handlers) LoginPost(ctx iris.Context) {
 	if login {
 		ctx.Application().Logger().Infof("%s logged in.", email)
 
-		s := s.Services.Session.Start(ctx)
-		s.Set("authenticated", true)
+		sess := s.Services.Session.Start(ctx)
+		sess.Set("authenticated", true)
+
+		// Set last sign in
+		user.LastSignIn = time.Now()
+		s.Services.Database.SQL.Update(user)
 
 		if ctx.URLParamExists("next") {
 			ctx.Redirect(fmt.Sprintf("https://%s/", ctx.URLParam("next")))

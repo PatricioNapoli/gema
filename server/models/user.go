@@ -3,15 +3,19 @@ package models
 import (
 	"github.com/go-pg/pg"
 	"gema/server/utils"
+	"time"
 )
 
 type User struct {
 	TableName struct{} `sql:"gema_users"`
 
-	Id    int64
+	BaseModel
+
 	Email string
 	Name  string
 	Hash  string
+
+	LastSignIn time.Time
 
 	Groups   []*Group `pg:",many2many:gema_membership"`
 }

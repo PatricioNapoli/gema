@@ -5,19 +5,19 @@ import (
 	"os"
 	"time"
 
+	"go.elastic.co/apm"
 	"github.com/go-pg/pg"
 	"github.com/go-redis/redis"
 	"github.com/kataras/iris/sessions"
 	irisRedis "github.com/kataras/iris/sessions/sessiondb/redis"
 	"github.com/kataras/iris/sessions/sessiondb/redis/service"
-	"github.com/elastic/apm-agent-go"
 )
 
 type Services struct {
 	Database *database.Database
 	NoSQL    *redis.Client
 	Session  *sessions.Sessions
-	Tracing *elasticapm.Tracer
+	Tracing *apm.Tracer
 }
 
 // Creates a new Services object containing all the services needed for operating with environment.
@@ -50,11 +50,16 @@ func New() *Services {
 
 	s.UseDatabase(r)
 
+	if d.Migrate() {
+		// DB was droppped, destroy sessions
+		s.DestroyAll()
+	}
+
 	return &Services{
 		Database: d,
 		NoSQL:    rc,
 		Session:  s,
-		Tracing: elasticapm.DefaultTracer,
+		Tracing: apm.DefaultTracer,
 	}
 }
 

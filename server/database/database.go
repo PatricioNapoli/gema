@@ -17,9 +17,6 @@ func New(sql *pg.DB) *Database {
 		SQL: sql,
 	}
 
-	err := d.migrate()
-	utils.Handle(err)
-
 	return d
 }
 
@@ -49,7 +46,7 @@ func (s *Database) loadInitialData() {
 	}
 }
 
-func (s *Database) migrate() error {
+func (s *Database) Migrate() bool {
 	tables := []interface{}{
 		(*models.User)(nil),
 		(*models.Group)(nil),
@@ -63,9 +60,11 @@ func (s *Database) migrate() error {
 		utils.Handle(err)
 	}
 
-	if s.IsFirstBoot() {
+	isFirst := s.IsFirstBoot()
+
+	if isFirst {
 		s.loadInitialData()
 	}
 
-	return nil
+	return isFirst
 }

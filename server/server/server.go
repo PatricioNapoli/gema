@@ -39,7 +39,6 @@ func (s Server) Start(addr string) {
 	s.App.Run(iris.Addr(addr), iris.WithConfiguration(iris.Configuration{
 		DisableStartupLog:     true,
 		DisablePathCorrection: true,
-		DisableVersionChecker: true,
 	}))
 }
 
