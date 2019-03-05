@@ -114,7 +114,7 @@ func getRoute(svc Attributes) string {
 	if os.Getenv("ENVIRONMENT") == "dev" {
 		hq := "hq."
 		if svc.Domain != "" {
-			hq = svc.Domain + "."
+			hq = svc.Name + "."
 		}
 		route = fmt.Sprintf("%s%s%s", sub, hq, "localhost")
 	}
