@@ -1,6 +1,7 @@
 package event
 
 import (
+	"strings"
 	"fmt"
 	"gema/agent/database"
 	"gema/agent/utils"
@@ -106,7 +107,11 @@ func getRoute(svc Attributes) string {
 	}
 
 	if svc.Domain != "" {
-		route = fmt.Sprintf("%s%s%s", sub, stg, svc.Domain)
+		if strings.Contains(svc.Domain, ".") {
+			route = fmt.Sprintf("%s%s%s", sub, stg, svc.Domain)
+		} else {
+			route = fmt.Sprintf("%s%s%s.%s", sub, stg, svc.Domain, os.Getenv("HQ_DOMAIN"))
+		}
 	} else {
 		route = fmt.Sprintf("%s%s", sub, os.Getenv("HQ_DOMAIN"))
 	}
