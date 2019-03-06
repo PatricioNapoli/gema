@@ -1,3 +1,5 @@
 .env
 auth/htpasswd
 chat/volumes
+certs/domain.crt
+certs/domain.key
