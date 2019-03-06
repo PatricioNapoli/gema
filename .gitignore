@@ -1,5 +1,4 @@
 .env
 auth/htpasswd
 chat/volumes
-certs/fullchain.pem
-certs/privkey.key
+certs/
