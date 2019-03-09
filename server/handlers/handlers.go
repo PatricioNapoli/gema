@@ -64,15 +64,10 @@ func (s *Handlers) LoginPost(ctx iris.Context) {
 }
 
 func (s *Handlers) Logout(ctx iris.Context) {
-	if !s.Services.Database.IsFirstUser() {
-		ctx.Redirect("/")
-		return
-	}
-
 	session := s.Services.Session.Start(ctx)
 	session.Set("authenticated", false)
 
-	views.LoginPage(ctx)
+	ctx.Redirect("/")
 }
 
 func (s *Handlers) SetupGet(ctx iris.Context) {
