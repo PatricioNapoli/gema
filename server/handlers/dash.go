@@ -21,7 +21,7 @@ func (s *Dashboard) requiresLogin(ctx iris.Context) bool {
 	session := s.Services.Session.Start(ctx)
 
 	if session.GetBooleanDefault("authenticated", false) {
-		return true
+		return false
 	}
 
 	if ctx.URLParamExists("next") {
@@ -29,8 +29,7 @@ func (s *Dashboard) requiresLogin(ctx iris.Context) bool {
 	}
 
 	views.LoginPage(ctx)
-	return false
+	return true
 }
 
-// TODO: Logout
 // TODO: Clear another user's session?
