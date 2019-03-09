@@ -69,7 +69,9 @@ func (s *Handlers) Logout(ctx iris.Context) {
 		return
 	}
 
-	s.Services.Session.Destroy(ctx)
+	session := s.Services.Session.Start(ctx)
+	session.Set("authenticated", false)
+
 	views.LoginPage(ctx)
 }
 
