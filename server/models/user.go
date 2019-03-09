@@ -1,8 +1,8 @@
 package models
 
 import (
-	"github.com/go-pg/pg"
 	"gema/server/utils"
+	"github.com/go-pg/pg"
 	"time"
 )
 

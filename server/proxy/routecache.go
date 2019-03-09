@@ -37,7 +37,7 @@ type ConfigRefreshEvent struct {
 }
 
 func (rc *RouteCache) configChecker() {
-	events, err := rc.services.NoSQL.LRange("service:events", 0, -1).Result()
+	events, err := rc.services.Store.LRange("service:events", 0, -1).Result()
 	if err == redis.Nil {
 		return
 	}
@@ -47,7 +47,7 @@ func (rc *RouteCache) configChecker() {
 		utils.FromJSON([]byte(ev), event)
 
 		if _, exists := rc.processed[event.Id]; !exists {
-			svc, _ := rc.services.NoSQL.Get(event.Service).Result()
+			svc, _ := rc.services.Store.Get(event.Service).Result()
 			rc.cache[event.Service] = svc
 			rc.processed[event.Id] = true
 		}
@@ -65,7 +65,7 @@ func (rc *RouteCache) GetRouteConfig(host string) string {
 		return val
 	}
 
-	svc, err := rc.services.NoSQL.Get(key).Result()
+	svc, err := rc.services.Store.Get(key).Result()
 	if err == redis.Nil {
 		return ""
 	}

@@ -1,10 +1,10 @@
 package handlers
 
 import (
-	"github.com/kataras/iris"
+	"fmt"
 	"gema/server/services"
 	"gema/server/views"
-	"fmt"
+	"github.com/kataras/iris"
 )
 
 type Dashboard struct {
@@ -12,16 +12,16 @@ type Dashboard struct {
 }
 
 func (s *Dashboard) HQ(ctx iris.Context) {
-	s.requireLogin(ctx)
-
-	views.HQ(ctx)
+	if !s.requiresLogin(ctx) {
+		views.HQ(ctx)
+	}
 }
 
-func (s *Dashboard) requireLogin(ctx iris.Context) {
+func (s *Dashboard) requiresLogin(ctx iris.Context) bool {
 	session := s.Services.Session.Start(ctx)
 
 	if session.GetBooleanDefault("authenticated", false) {
-		return
+		return true
 	}
 
 	if ctx.URLParamExists("next") {
@@ -29,6 +29,7 @@ func (s *Dashboard) requireLogin(ctx iris.Context) {
 	}
 
 	views.LoginPage(ctx)
+	return false
 }
 
 // TODO: Logout

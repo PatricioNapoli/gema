@@ -5,9 +5,9 @@ import (
 	"gema/server/services"
 	"os"
 
+	"gema/server/proxy"
 	"github.com/getsentry/raven-go"
 	"github.com/kataras/iris"
-	"gema/server/proxy"
 )
 
 func main() {

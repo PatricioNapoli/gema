@@ -63,6 +63,16 @@ func (s *Handlers) LoginPost(ctx iris.Context) {
 	views.LoginPage(ctx)
 }
 
+func (s *Handlers) Logout(ctx iris.Context) {
+	if !s.Services.Database.IsFirstUser() {
+		ctx.Redirect("/")
+		return
+	}
+
+	s.Services.Session.Destroy(ctx)
+	views.LoginPage(ctx)
+}
+
 func (s *Handlers) SetupGet(ctx iris.Context) {
 	if !s.Services.Database.IsFirstUser() {
 		ctx.Redirect("/")

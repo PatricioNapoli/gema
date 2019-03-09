@@ -52,6 +52,7 @@ func (s *Server) setupRoutes() {
 	s.App.Get("/", s.Handlers.Dashboard.HQ)
 
 	s.App.Post("/login", s.Handlers.LoginPost)
+	s.App.Get("/logout", s.Handlers.Logout)
 	s.App.Get("/setup", s.Handlers.SetupGet)
 	s.App.Post("/setup", s.Handlers.SetupPost)
 

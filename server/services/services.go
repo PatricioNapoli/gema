@@ -5,19 +5,19 @@ import (
 	"os"
 	"time"
 
-	"go.elastic.co/apm"
 	"github.com/go-pg/pg"
 	"github.com/go-redis/redis"
 	"github.com/kataras/iris/sessions"
 	irisRedis "github.com/kataras/iris/sessions/sessiondb/redis"
 	"github.com/kataras/iris/sessions/sessiondb/redis/service"
+	"go.elastic.co/apm"
 )
 
 type Services struct {
 	Database *database.Database
-	NoSQL    *redis.Client
+	Store    *redis.Client
 	Session  *sessions.Sessions
-	Tracing *apm.Tracer
+	Tracing  *apm.Tracer
 }
 
 // Creates a new Services object containing all the services needed for operating with environment.
@@ -57,13 +57,13 @@ func New() *Services {
 
 	return &Services{
 		Database: d,
-		NoSQL:    rc,
+		Store:    rc,
 		Session:  s,
-		Tracing: apm.DefaultTracer,
+		Tracing:  apm.DefaultTracer,
 	}
 }
 
 func (s *Services) Dispose() {
 	s.Database.Dispose()
-	s.NoSQL.Close()
+	s.Store.Close()
 }
