@@ -19,6 +19,8 @@ services:
         delay: 5s
         max_attempts: 3
         window: 120s
+      placement:
+        constraints: [node.labels.category == main]
     volumes:
       - data:/var/lib/sentry/files
     networks:
@@ -38,6 +40,8 @@ services:
         delay: 5s
         max_attempts: 3
         window: 120s
+      placement:
+        constraints: [node.labels.category == main]
     networks:
       - gema
 
@@ -62,6 +66,8 @@ services:
         delay: 5s
         max_attempts: 3
         window: 120s
+      placement:
+        constraints: [node.labels.category == main]
     networks:
       - gema
     volumes:

@@ -180,7 +180,7 @@ metricbeat.modules:
 - module: nginx
   metricsets: ["stubstatus"]
   enabled: true
-  period: 30s
+  period: 1m
 
   # Nginx hosts
   hosts: ["http://nginx"]
@@ -201,7 +201,7 @@ metricbeat.modules:
     # Stats about every PostgreSQL process
     - activity
 
-  period: 30s
+  period: 1m
 
   # The host must be passed as PostgreSQL URL. Example:
   # postgres://localhost:5432?sslmode=disable
@@ -219,7 +219,7 @@ metricbeat.modules:
 - module: redis
   metricsets: ["info", "keyspace"]
   enabled: true
-  period: 30s
+  period: 1m
 
   # Redis hosts
   hosts: ["redis:6379"]
@@ -249,7 +249,7 @@ metricbeat.modules:
 
 - module: memcached
   metricsets: ["stats"]
-  period: 10s
+  period: 1m
   hosts: ["memcached:11211"]
   enabled: true
 

@@ -1,4 +1,4 @@
 .env
 auth/htpasswd
 chat/volumes
-certs/
+certs/*.pem

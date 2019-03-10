@@ -11,6 +11,8 @@ services:
         delay: 5s
         max_attempts: 3
         window: 120s
+      placement:
+        constraints: [node.labels.category == main]
     networks:
       - gema
     volumes:
@@ -26,6 +28,8 @@ services:
         delay: 5s
         max_attempts: 3
         window: 120s
+      placement:
+        constraints: [node.labels.category == main]
     networks:
       - gema
 

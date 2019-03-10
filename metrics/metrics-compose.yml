@@ -3,6 +3,10 @@ version: "3.7"
 services:
   prometheus:
     image: prom/prometheus
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+      - '--storage.tsdb.path=/prometheus'
+      - '--storage.tsdb.retention.time=72h'
     deploy:
       mode: replicated
       replicas: 1
@@ -11,30 +15,60 @@ services:
         delay: 5s
         max_attempts: 3
         window: 120s
+      placement:
+        constraints: [node.labels.category == main]
     networks:
       - gema
     volumes:
       - prometheus_data:/prometheus
       - ./prometheus.yml:/etc/prometheus/prometheus.yml
 
-  exporter:
-    image: prom/node-exporter
+  node-exporter:
+    image: localhost:5000/gema/node-exporter
+    environment:
+      - NODE_ID={{.Node.ID}}
+    volumes:
+      - /proc:/host/proc:ro
+      - /sys:/host/sys:ro
+      - /:/rootfs:ro
+      - /etc/hostname:/etc/nodename
+    command:
+      - '--path.sysfs=/host/sys'
+      - '--path.procfs=/host/proc'
+      - '--collector.textfile.directory=/etc/node-exporter/'
+      - '--collector.filesystem.ignored-mount-points=^/(sys|proc|dev|host|etc)($$|/)'
+      - '--no-collector.ipvs'
     deploy:
       mode: global
-      restart_policy:
-        condition: on-failure
-        delay: 5s
-        max_attempts: 3
-        window: 120s
     networks:
         - gema
 
+  cadvisor:
+    image: google/cadvisor
+    command:
+      - '-logtostderr'
+      - '-allow_dynamic_housekeeping=true'
+      - '-housekeeping_interval=30s'
+      - '-global_housekeeping_interval=30s'
+      - '-disable_metrics=disk,tcp,udp'
+      - '-docker_only=true'
+    networks:
+      - gema
+    deploy:
+      mode: global
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - /:/rootfs:ro
+      - /var/run:/var/run
+      - /sys:/sys:ro
+      - /var/lib/docker/:/var/lib/docker:ro
+  
   grafana:
     image: grafana/grafana
     environment:
       - GF_AUTH_ANONYMOUS_ENABLED=true
       - GF_AUTH_ANONYMOUS_ORG_NAME=Geminis
-      - GF_AUTH_ANONYMOUS_ORG_ROLE=Admin
+      - GF_AUTH_ANONYMOUS_ORG_ROLE=Viewer
       - GF_USERS_ALLOW_SIGN_UP=false
     labels:
       gema.service: grafana
@@ -49,6 +83,8 @@ services:
         delay: 5s
         max_attempts: 3
         window: 120s
+      placement:
+        constraints: [node.labels.category == main]
     networks:
       - gema
     volumes:

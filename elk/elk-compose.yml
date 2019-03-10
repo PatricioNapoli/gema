@@ -18,6 +18,8 @@ services:
         delay: 5s
         max_attempts: 3
         window: 120s
+      placement:
+        constraints: [node.labels.category == main]
     networks:
       - gema
     volumes:
@@ -42,6 +44,8 @@ services:
         delay: 5s
         max_attempts: 3
         window: 120s
+      placement:
+        constraints: [node.labels.category == main]
     networks:
       - gema
     volumes:
@@ -62,6 +66,8 @@ services:
         delay: 5s
         max_attempts: 3
         window: 120s
+      placement:
+        constraints: [node.labels.category == main]
     command: metricbeat -e -strict.perms=false
 
   filebeat:
@@ -80,6 +86,8 @@ services:
         delay: 5s
         max_attempts: 3
         window: 120s
+      placement:
+        constraints: [node.labels.category == main]
     command: filebeat -e -strict.perms=false
 
   goapm:
@@ -94,6 +102,8 @@ services:
         delay: 5s
         max_attempts: 3
         window: 120s
+      placement:
+        constraints: [node.labels.category == main]
     volumes:
       - ./apm-server.yml:/usr/share/apm-server/apm-server.yml
     command: apm-server -e -strict.perms=false

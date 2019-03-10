@@ -13,6 +13,8 @@ services:
         delay: 5s
         max_attempts: 3
         window: 120s
+      placement:
+        constraints: [node.labels.category == main]
     networks:
       - gema
     volumes:
@@ -28,7 +30,6 @@ services:
       gema.subdomain: pgadmin
     environment:
       PGADMIN_DEFAULT_EMAIL: admin@geminis.io
-      # PGADMIN_ENABLE_TLS: "True"
     deploy:
       mode: replicated
       replicas: 1
@@ -37,12 +38,12 @@ services:
         delay: 5s
         max_attempts: 3
         window: 120s
+      placement:
+        constraints: [node.labels.category == main]
     networks:
       - gema
     volumes:
       - pgadmin_data:/var/lib/pgadmin
-      # - ../certs/domain.crt:/certs/server.cert
-      # - ../certs/domain.key:/certs/server.key
 
 networks:
   gema:
