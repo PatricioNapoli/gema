@@ -85,12 +85,12 @@ type service struct {
 }
 
 func (s *Proxy) proxy(ctx iris.Context) {
+	tx := s.Services.Tracing.StartTransaction(fmt.Sprintf("%s %s%s", ctx.Method(), ctx.Host(), ctx.Path()), "proxy")
+	defer tx.End()
+
 	session := s.Services.Session.Start(ctx)
 
 	if ctx.Host() == os.Getenv("HQ_DOMAIN") {
-		tx := s.Services.Tracing.StartTransaction(fmt.Sprintf("%s %s%s", ctx.Method(), ctx.Host(), ctx.Path()), "proxy")
-		defer tx.End()
-
 		target, _ := url.Parse("http://localhost:81/")
 		proxy := NewHTTPProxy(target, ctx.Host(), ctx.GetHeader("X-Real-IP"))
 		proxy.ServeHTTP(ctx.ResponseWriter(), ctx.Request())
@@ -127,9 +127,6 @@ func (s *Proxy) proxy(ctx iris.Context) {
 			wsProxy.ServeHTTP(ctx.ResponseWriter(), ctx.Request())
 			return
 		}
-
-		tx := s.Services.Tracing.StartTransaction(fmt.Sprintf("%s %s%s", ctx.Method(), ctx.Host(), ctx.Path()), "proxy")
-		defer tx.End()
 
 		proxy := NewHTTPProxy(target, ctx.Host(), ctx.GetHeader("X-Real-IP"))
 		proxy.ServeHTTP(ctx.ResponseWriter(), ctx.Request())

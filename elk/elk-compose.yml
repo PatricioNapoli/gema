@@ -4,6 +4,8 @@ services:
   elasticsearch:
     image: docker.elastic.co/elasticsearch/elasticsearch:6.3.2
     hostname: "elasticsearch"
+    env_file:
+      - ../.env
     environment:
       discovery.zen.ping.unicast.hosts: elasticsearch
       discovery.zen.minimum_master_nodes: 1
@@ -55,6 +57,7 @@ services:
     image: docker.elastic.co/beats/metricbeat:6.3.2
     volumes:
       - ./metricbeat.yml:/usr/share/metricbeat/metricbeat.yml
+      - ./metricbeat-entrypoint.sh:/usr/share/metricbeat/metricbeat-entrypoint.sh
     networks:
       - gema
     env_file:
@@ -68,13 +71,15 @@ services:
         window: 120s
       placement:
         constraints: [node.labels.category == main]
-    command: metricbeat -e -strict.perms=false
+    command: metricbeat-entrypoint.sh
 
   filebeat:
+    user: root
     image: docker.elastic.co/beats/filebeat:6.2.2
     volumes:
       - nginx_logs:/var/log/nginx
       - ./filebeat.yml:/usr/share/filebeat/filebeat.yml
+      - ./filebeat-entrypoint.sh:/usr/share/filebeat/filebeat-entrypoint.sh
       - /var/log/auth.log:/var/log/auth.log
       - /var/log/syslog:/var/log/syslog
     networks:
@@ -88,10 +93,10 @@ services:
         window: 120s
       placement:
         constraints: [node.labels.category == main]
-    command: filebeat -e -strict.perms=false
+    command: filebeat-entrypoint.sh
 
   goapm:
-    image: docker.elastic.co/apm/apm-server:6.4.0
+    image: docker.elastic.co/apm/apm-server:6.6.1
     networks:
       - gema
     deploy:

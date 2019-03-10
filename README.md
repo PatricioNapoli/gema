@@ -26,6 +26,9 @@ Using the following environment:
 * Kibana
 * FileBeat
 * MetricBeat
+* Prometheus
+* Grafana
+* cAdvisor
 
 ## Generating a self signed certificate.
 ```
@@ -46,6 +49,14 @@ SSH to metricbeat and filebeat containers and run
 ```
 ./metricbeat setup -e -strict.perms=false -E setup.kibana.host=kibana:5601
 ./filebeat setup -e -strict.perms=false -E setup.kibana.host=kibana:5601
+```
+
+For sending container logs to kibana: 
+```
+logging:
+  driver: gelf
+  options:
+    gelf-address: udp://localhost:12201
 ```
 
 Login to pgadmin and run the SQL in `databases.sql`
