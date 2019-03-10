@@ -47,7 +47,6 @@ services:
     image: google/cadvisor:v0.33.0
     command:
       - '-logtostderr'
-      - '-allow_dynamic_housekeeping=true'
       - '-housekeeping_interval=30s'
       - '-global_housekeeping_interval=30s'
       - '-disable_metrics=diskIO,disk,tcp,udp'
