@@ -2,7 +2,7 @@ version: "3.7"
 
 services:
   chat:
-    image: localhost:5000/gema/chat
+    image: mattermost/mattermost-team-edition:5.8.0
     env_file:
       - ../.env
     environment:
@@ -10,7 +10,7 @@ services:
       MM_DBNAME: gema_mm
     labels:
       gema.service: chat
-      gema.auth: 1
+      gema.auth: 0
       gema.port: 8000
       gema.subdomain: chat
     deploy:
