@@ -10,7 +10,7 @@ services:
       MM_DBNAME: gema_mm
     labels:
       gema.service: chat
-      gema.auth: 1
+      gema.auth: 0
       gema.port: 8000
       gema.subdomain: chat
     deploy:
