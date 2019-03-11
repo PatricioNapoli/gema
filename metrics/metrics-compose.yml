@@ -47,7 +47,7 @@ services:
     image: google/cadvisor:v0.33.0
     command:
       - '-logtostderr'
-      - '-housekeeping_interval=30s'
+      - '-housekeeping_interval=5s'
       - '-global_housekeeping_interval=30s'
       - '-disable_metrics=diskIO,disk,tcp,udp'
       - '-docker_only=true'
