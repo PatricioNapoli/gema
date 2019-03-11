@@ -5,7 +5,7 @@ services:
     image: nextcloud:apache
     labels:
       gema.service: nextcloud
-      gema.auth: 1
+      gema.auth: 0
       gema.subdomain: cloud
     environment:
       POSTGRES_HOST: postgres
