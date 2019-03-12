@@ -15,7 +15,7 @@ services:
     deploy:
       resources:
         limits:
-          memory: 1024M
+          memory: 1512M
       mode: replicated
       replicas: 1
       restart_policy:

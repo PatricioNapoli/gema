@@ -118,6 +118,7 @@ sudo chown -R 2000:2000 ./chat/volumes/app/mattermost/
 * Add Elastic Curator.
 * Filebeat for PGSQL and Redis logs.
 * Speed up ElasticSearch with Redis?
+* Try serving static files through nginx to prevent going through the whole proxy, capture subdomain.
 
 
 * Code Documentation, Wiki.js vs BookStack
