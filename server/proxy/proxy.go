@@ -1,6 +1,7 @@
 package proxy
 
 import (
+	"strings"
 	"fmt"
 	"gema/server/utils"
 	"go.elastic.co/apm"
@@ -89,8 +90,10 @@ func (s *Proxy) proxy(ctx iris.Context) {
 	session := s.Services.Session.Start(ctx)
 
 	if ctx.Host() == os.Getenv("HQ_DOMAIN") {
-		tx := apm.DefaultTracer.StartTransaction(fmt.Sprintf("%s %s%s", ctx.Method(), ctx.Host(), ctx.Path()), "hq")
-		defer tx.End()
+		if !strings.Contains(ctx.Path(), "websocket") {
+			tx := apm.DefaultTracer.StartTransaction(fmt.Sprintf("%s %s%s", ctx.Method(), ctx.Host(), ctx.Path()), "hq")
+			defer tx.End()
+		}
 
 		target, _ := url.Parse("http://localhost:81/")
 		proxy := NewHTTPProxy(target, ctx.Host(), ctx.GetHeader("X-Real-IP"))
@@ -107,8 +110,10 @@ func (s *Proxy) proxy(ctx iris.Context) {
 	serv := &service{}
 	utils.FromJSON([]byte(svc), &serv)
 
-	tx := apm.DefaultTracer.StartTransaction(fmt.Sprintf("%s %s%s", ctx.Method(), ctx.Host(), ctx.Path()), serv.Name)
-	defer tx.End()
+	if !strings.Contains(ctx.Path(), "websocket") {
+		tx := apm.DefaultTracer.StartTransaction(fmt.Sprintf("%s %s%s", ctx.Method(), ctx.Host(), ctx.Path()), serv.Name)
+		defer tx.End()
+	}
 
 	if serv.Auth == "0" || session.GetBooleanDefault("authenticated", false)  {
 		port := ":80"

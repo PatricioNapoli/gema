@@ -13,6 +13,9 @@ services:
       node.name: elasticsearch
       network.host: 0.0.0.0
     deploy:
+      resources:
+        limits:
+          memory: 1024M
       mode: replicated
       replicas: 1
       restart_policy:

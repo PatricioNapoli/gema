@@ -103,8 +103,8 @@ sudo chown -R 2000:2000 ./chat/volumes/app/mattermost/
 ## TODO
 
 * Internal proxy auth, create dashboard for creating users, groups. These users work for the HQ and the internal services, limit access to kibana. In dash show service configs
-* Cluster redis and postgres for data redundancy.
-* Support global replication for better performance of some services: ElasticSearch, Prometheus, Redis, PGSQL, GEMA Server
+* Cluster redis, postgres, prometheus and elasticsearch.
+* Support replication for better performance of some services: ElasticSearch, Prometheus, Redis, PGSQL, GEMA Server
 * Node communication/synchronization can be achieved through DSM solution using Redis as a message broker, like events.
 * GEMA dashboard, geminis.io, live ops, reports generation, ML, message broadcast through WS, push notifications, service routings, let client have a user
 * CORS?
@@ -113,8 +113,11 @@ sudo chown -R 2000:2000 ./chat/volumes/app/mattermost/
 * LogSkip internal pages with yml setting
 * Use Hazelcast for PGSQL and Redis cache
 * Add specific versioning for every service to prevent automatic upgrades.
-* Use internal docker registry.
-* Support service route config modification on the fly.
+* Use internal docker registry?
+* Support service route config modification on the fly. Maybe use JSON (like consul) when config becomes too complex.
+* Add Elastic Curator.
+* Filebeat for PGSQL and Redis logs.
+* Speed up ElasticSearch with Redis?
 
 
 * Code Documentation, Wiki.js vs BookStack
