@@ -2,16 +2,16 @@ package proxy
 
 import (
 	"bytes"
-	"compress/gzip"
 	"fmt"
 	"gema/server/utils"
 	"go.elastic.co/apm"
-	"io"
 	"io/ioutil"
+	"log"
 	"net/http"
 	"net/url"
 	"os"
 	"path/filepath"
+	"strconv"
 	"strings"
 
 	"gema/server/services"
@@ -145,9 +145,11 @@ func (s *Proxy) proxy(ctx iris.Context) {
 
 		proxy := NewHTTPProxy(target, ctx.Host(), ctx.GetHeader("X-Real-IP"))
 
-		//if utils.MatchStaticFiles(ctx.Path()) {
-		//	proxy.ModifyResponse = interceptStaticFile
-		//}
+		if !strings.Contains(ctx.Path(), ".php") {
+			if utils.MatchStaticFiles(ctx.Path()) {
+				proxy.ModifyResponse = interceptStaticFile
+			}
+		}
 
 		proxy.ServeHTTP(ctx.ResponseWriter(), ctx.Request())
 
@@ -158,39 +160,54 @@ func (s *Proxy) proxy(ctx iris.Context) {
 }
 
 func interceptStaticFile(resp *http.Response) (err error) {
-	var reader io.ReadCloser
-	if resp.Header.Get("Content-Encoding") == "gzip" {
-		reader, err = gzip.NewReader(resp.Body)
-		defer reader.Close()
-		if err != nil {
+	var b []byte
+
+	isGzip := resp.Header.Get("Content-Encoding") == "gzip"
+
+	if isGzip {
+		if err := utils.Gunzip(resp.Body, &b); err != nil {
 			return err
 		}
 	} else {
-		reader = resp.Body
+		if b, err = ioutil.ReadAll(resp.Body); err != nil {
+			return  err
+		}
 	}
 
-	b, err := ioutil.ReadAll(reader)
-	if err != nil {
-		return  err
-	}
-	err = resp.Body.Close()
-	if err != nil {
+	if err = resp.Body.Close(); err != nil {
 		return err
 	}
+
+	if len(b) == 0 {
+		log.Println("KIBANA FILE WITH 0 BYTES")
+	}
+	log.Println(resp.Request.RequestURI)
 
 	fileDir := fmt.Sprintf("/static/%s/%s", resp.Request.Host, resp.Request.RequestURI[1:])
-	err = os.MkdirAll(filepath.Dir(fileDir), 0755)
 
+	if err = os.MkdirAll(filepath.Dir(fileDir), 0755); err != nil {
+		return err
+	}
+
+	f, err := os.OpenFile(fileDir, os.O_RDWR|os.O_CREATE|os.O_TRUNC, 0644)
+	if err != nil {
+		return err
+	}
+	length, err := f.Write(b)
 	if err != nil {
 		return err
 	}
 
-	err = ioutil.WriteFile(fileDir, b, 0644)
-	if err != nil {
-		return err
+	if isGzip {
+		err = utils.GZip(&b, &b)
+		if err != nil {
+			return err
+		}
 	}
 
 	body := ioutil.NopCloser(bytes.NewReader(b))
 	resp.Body = body
+	resp.ContentLength = int64(length)
+	resp.Header.Set("Content-Length", strconv.Itoa(length))
 	return nil
 }
