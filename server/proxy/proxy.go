@@ -2,9 +2,11 @@ package proxy
 
 import (
 	"bytes"
+	"compress/gzip"
 	"fmt"
 	"gema/server/utils"
 	"go.elastic.co/apm"
+	"io"
 	"io/ioutil"
 	"net/http"
 	"net/url"
@@ -156,7 +158,18 @@ func (s *Proxy) proxy(ctx iris.Context) {
 }
 
 func interceptStaticFile(resp *http.Response) (err error) {
-	b, err := ioutil.ReadAll(resp.Body)
+	var reader io.ReadCloser
+	if resp.Header.Get("Content-Encoding") == "gzip" {
+		reader, err = gzip.NewReader(resp.Body)
+		defer reader.Close()
+		if err != nil {
+			return err
+		}
+	} else {
+		reader = resp.Body
+	}
+
+	b, err := ioutil.ReadAll(reader)
 	if err != nil {
 		return  err
 	}
