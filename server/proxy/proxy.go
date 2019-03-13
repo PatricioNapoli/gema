@@ -145,9 +145,9 @@ func (s *Proxy) proxy(ctx iris.Context) {
 
 		proxy := NewHTTPProxy(target, ctx.Host(), ctx.GetHeader("X-Real-IP"))
 
-		if utils.MatchStaticFiles(ctx.Path()) {
-			proxy.ModifyResponse = interceptStaticFile
-		}
+		//if utils.MatchStaticFiles(ctx.Path()) {
+		//	proxy.ModifyResponse = interceptStaticFile
+		//}
 
 		proxy.ServeHTTP(ctx.ResponseWriter(), ctx.Request())
 
