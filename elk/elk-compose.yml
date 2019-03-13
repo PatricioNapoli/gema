@@ -74,7 +74,7 @@ services:
         window: 120s
       placement:
         constraints: [node.labels.category == main]
-    command: metricbeat-entrypoint.sh
+    command: metricbeat -e -strict.perms=false
 
   filebeat:
     user: root
@@ -96,9 +96,9 @@ services:
         window: 120s
       placement:
         constraints: [node.labels.category == main]
-    command: filebeat-entrypoint.sh
+    command: filebeat -e -strict.perms=false
 
-  goapm:
+  apm:
     image: docker.elastic.co/apm/apm-server:6.6.1
     networks:
       - gema
@@ -123,5 +123,7 @@ networks:
 volumes:
   elasticsearch_data:
   kibana_data:
+  nginx_static:
+    external: true
   nginx_logs:
     external: true

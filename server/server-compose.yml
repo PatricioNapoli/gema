@@ -6,7 +6,7 @@ services:
     env_file:
       - ../.env
     environment:
-      ELASTIC_APM_SERVER_URL: http://goapm:8200
+      ELASTIC_APM_SERVER_URL: http://apm:8200
       ELASTIC_APM_SERVICE_NAME: gema-proxy
     deploy:
       mode: replicated

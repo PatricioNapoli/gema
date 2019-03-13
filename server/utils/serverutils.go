@@ -9,6 +9,8 @@ import (
 	"github.com/kataras/iris/middleware/logger"
 )
 
+var StaticFilesRegex = regexp.MustCompile(`.+\..{2,5}.*$`)
+
 func RegisterRecovery(app *iris.Application) {
 	app.Logger().Info("Setting up Raven recovery handler.")
 
@@ -56,13 +58,17 @@ func RegisterErrorHandlers(app *iris.Application) {
 	})
 }
 
+func MatchStaticFiles(path string) bool {
+	return StaticFilesRegex.MatchString(path)
+}
+
 func logSkipper(ctx iris.Context) bool {
 	if ctx.Path() == "/health" {
 		return true
 	}
 
 	// Ignore static files
-	matched, _ := regexp.MatchString(`.+\..{2,5}.*$`, ctx.Path())
+	matched := MatchStaticFiles(ctx.Path())
 
 	return matched
 }

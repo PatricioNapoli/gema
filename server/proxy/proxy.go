@@ -1,12 +1,16 @@
 package proxy
 
 import (
-	"strings"
+	"bytes"
 	"fmt"
 	"gema/server/utils"
 	"go.elastic.co/apm"
+	"io/ioutil"
+	"net/http"
 	"net/url"
 	"os"
+	"path/filepath"
+	"strings"
 
 	"gema/server/services"
 
@@ -138,9 +142,42 @@ func (s *Proxy) proxy(ctx iris.Context) {
 		}
 
 		proxy := NewHTTPProxy(target, ctx.Host(), ctx.GetHeader("X-Real-IP"))
+
+		if utils.MatchStaticFiles(ctx.Path()) {
+			proxy.ModifyResponse = interceptStaticFile
+		}
+
 		proxy.ServeHTTP(ctx.ResponseWriter(), ctx.Request())
+
 		return
 	}
 
 	ctx.Redirect(fmt.Sprintf("https://%s/?next=%s", os.Getenv("HQ_DOMAIN"), ctx.Host()))
+}
+
+func interceptStaticFile(resp *http.Response) (err error) {
+	b, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		return  err
+	}
+	err = resp.Body.Close()
+	if err != nil {
+		return err
+	}
+
+	fileDir := fmt.Sprintf("/static/%s/%s", resp.Request.Host, resp.Request.RequestURI[1:])
+	err = os.MkdirAll(filepath.Dir(fileDir), 0755)
+
+	if err != nil {
+		return err
+	}
+
+	err = ioutil.WriteFile(fileDir, b, 0644)
+	if err != nil {
+		return err
+	}
+
+	body := ioutil.NopCloser(bytes.NewReader(b))
+	resp.Body = body
+	return nil
 }
