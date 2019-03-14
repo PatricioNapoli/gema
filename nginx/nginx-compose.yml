@@ -31,6 +31,7 @@ services:
       - ./uwsgi_params:/etc/nginx/uwsgi_params
       - logs:/var/log/nginx/
       - static:/static
+      - cache:/cache
       - public:/usr/share/nginx/html
 
 networks:
@@ -41,3 +42,4 @@ volumes:
   static:
   public:
   logs:
+  cache:

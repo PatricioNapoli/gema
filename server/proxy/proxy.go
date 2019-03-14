@@ -1,17 +1,11 @@
 package proxy
 
 import (
-	"bytes"
 	"fmt"
 	"gema/server/utils"
 	"go.elastic.co/apm"
-	"io/ioutil"
-	"log"
-	"net/http"
 	"net/url"
 	"os"
-	"path/filepath"
-	"strconv"
 	"strings"
 
 	"gema/server/services"
@@ -144,73 +138,10 @@ func (s *Proxy) proxy(ctx iris.Context) {
 		}
 
 		proxy := NewHTTPProxy(target, ctx.Host(), ctx.GetHeader("X-Real-IP"))
-
-		if !strings.Contains(ctx.Path(), ".php") {
-			if utils.MatchStaticFiles(ctx.Path()) {
-				proxy.ModifyResponse = interceptStaticFile
-			}
-		}
-
 		proxy.ServeHTTP(ctx.ResponseWriter(), ctx.Request())
 
 		return
 	}
 
 	ctx.Redirect(fmt.Sprintf("https://%s/?next=%s", os.Getenv("HQ_DOMAIN"), ctx.Host()))
-}
-
-func interceptStaticFile(resp *http.Response) (err error) {
-	var b []byte
-
-	isGzip := resp.Header.Get("Content-Encoding") == "gzip"
-
-	if isGzip {
-		if err := utils.Gunzip(resp.Body, &b); err != nil {
-			return err
-		}
-	} else {
-		if b, err = ioutil.ReadAll(resp.Body); err != nil {
-			return  err
-		}
-	}
-
-	if err = resp.Body.Close(); err != nil {
-		return err
-	}
-
-	if len(b) == 0 {
-		log.Println("KIBANA FILE WITH 0 BYTES")
-	}
-	log.Println(resp.Request.RequestURI)
-
-
-	if len(b) > 0 {
-		fileDir := fmt.Sprintf("/static/%s/%s", resp.Request.Host, resp.Request.RequestURI[1:])
-
-		if err = os.MkdirAll(filepath.Dir(fileDir), 0755); err != nil {
-			return err
-		}
-
-		f, err := os.OpenFile(fileDir, os.O_RDWR|os.O_CREATE|os.O_TRUNC, 0644)
-		if err != nil {
-			return err
-		}
-		_, err = f.Write(b)
-		if err != nil {
-			return err
-		}
-
-		if isGzip {
-			err = utils.GZip(&b, &b)
-			if err != nil {
-				return err
-			}
-		}
-	}
-
-	body := ioutil.NopCloser(bytes.NewReader(b))
-	resp.Body = body
-	resp.ContentLength = int64(len(b))
-	resp.Header.Set("Content-Length", strconv.Itoa(len(b)))
-	return nil
 }
