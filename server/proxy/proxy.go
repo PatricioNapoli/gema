@@ -183,31 +183,34 @@ func interceptStaticFile(resp *http.Response) (err error) {
 	}
 	log.Println(resp.Request.RequestURI)
 
-	fileDir := fmt.Sprintf("/static/%s/%s", resp.Request.Host, resp.Request.RequestURI[1:])
 
-	if err = os.MkdirAll(filepath.Dir(fileDir), 0755); err != nil {
-		return err
-	}
+	if len(b) > 0 {
+		fileDir := fmt.Sprintf("/static/%s/%s", resp.Request.Host, resp.Request.RequestURI[1:])
 
-	f, err := os.OpenFile(fileDir, os.O_RDWR|os.O_CREATE|os.O_TRUNC, 0644)
-	if err != nil {
-		return err
-	}
-	length, err := f.Write(b)
-	if err != nil {
-		return err
-	}
+		if err = os.MkdirAll(filepath.Dir(fileDir), 0755); err != nil {
+			return err
+		}
 
-	if isGzip {
-		err = utils.GZip(&b, &b)
+		f, err := os.OpenFile(fileDir, os.O_RDWR|os.O_CREATE|os.O_TRUNC, 0644)
 		if err != nil {
 			return err
+		}
+		_, err = f.Write(b)
+		if err != nil {
+			return err
+		}
+
+		if isGzip {
+			err = utils.GZip(&b, &b)
+			if err != nil {
+				return err
+			}
 		}
 	}
 
 	body := ioutil.NopCloser(bytes.NewReader(b))
 	resp.Body = body
-	resp.ContentLength = int64(length)
-	resp.Header.Set("Content-Length", strconv.Itoa(length))
+	resp.ContentLength = int64(len(b))
+	resp.Header.Set("Content-Length", strconv.Itoa(len(b)))
 	return nil
 }
