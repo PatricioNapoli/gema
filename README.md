@@ -102,10 +102,14 @@ sudo chown -R 2000:2000 ./chat/volumes/app/mattermost/
 
 ## TODO
 
-* Internal proxy auth, create dashboard for creating users, groups. These users work for the HQ and the internal services, limit access to kibana. In dash show service configs
+* Internal proxy auth, create dashboard for creating users, groups. These users work for the HQ and the internal services, limit access to kibana. In dash show service configs.
+* Dashboard with machine learning analytics.
+* Dashboard for Service Redeployments (important), would be a release manager, you can even choose image version to deploy and see current version.
+* Nginx cache purge in dashboard
 * Cluster redis, postgres, prometheus and elasticsearch.
 * Support replication for better performance of some services: ElasticSearch, Prometheus, Redis, PGSQL, GEMA Server
 * Node communication/synchronization can be achieved through DSM solution using Redis as a message broker, like events.
+* Go client to use Redis as special per-node replication. (Redis multimaster?)
 * GEMA dashboard, geminis.io, live ops, reports generation, ML, message broadcast through WS, push notifications, service routings, let client have a user
 * CORS?
 * Apache Spark?
@@ -118,7 +122,6 @@ sudo chown -R 2000:2000 ./chat/volumes/app/mattermost/
 * Add Elastic Curator.
 * Filebeat for PGSQL and Redis logs.
 * Speed up ElasticSearch with Redis?
-* Try serving static files through nginx to prevent going through the whole proxy, capture subdomain.
 
 
 * Code Documentation, Wiki.js vs BookStack
@@ -150,4 +153,4 @@ Setup for CI:
 * Performance Test
 * Project badges
 
-These tests should be performed through CI in Host machine, so as to use it in every repo.
+These tests should be performed through CI in Host machine container (git pull from container?), so as to reuse it in every repo.
