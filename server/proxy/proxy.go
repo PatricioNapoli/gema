@@ -1,11 +1,15 @@
 package proxy
 
 import (
+	"bytes"
 	"fmt"
 	"gema/server/utils"
 	"go.elastic.co/apm"
+	"io/ioutil"
+	"net/http"
 	"net/url"
 	"os"
+	"strconv"
 	"strings"
 
 	"gema/server/services"
@@ -138,10 +142,34 @@ func (s *Proxy) proxy(ctx iris.Context) {
 		}
 
 		proxy := NewHTTPProxy(target, ctx.Host(), ctx.GetHeader("X-Real-IP"))
+		proxy.ModifyResponse = proxyInterception
 		proxy.ServeHTTP(ctx.ResponseWriter(), ctx.Request())
 
 		return
 	}
 
 	ctx.Redirect(fmt.Sprintf("https://%s/?next=%s", os.Getenv("HQ_DOMAIN"), ctx.Host()))
+}
+
+func proxyInterception(resp *http.Response) (err error) {
+	var b []byte
+
+	if b, err = ioutil.ReadAll(resp.Body); err != nil {
+		return  err
+	}
+
+	contentType := resp.Header.Get("Content-Type")
+
+	if strings.Contains(contentType, "json") || strings.Contains(contentType, "html") {
+		resp.Header.Set("Cache-Control", "no-cache, no-store")
+	}
+
+	length := len(b)
+
+	body := ioutil.NopCloser(bytes.NewReader(b))
+	resp.Body = body
+	resp.ContentLength = int64(length)
+	resp.Header.Set("Content-Length", strconv.Itoa(length))
+
+	return nil
 }
