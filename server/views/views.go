@@ -27,7 +27,7 @@ func Forbidden(ctx iris.Context) {
 }
 
 func HQ(ctx iris.Context) {
-	ctx.WriteString("HQ")
+	ctx.View("dash/hq.html")
 }
 
 func renderError(ctx iris.Context, code string, description string) {

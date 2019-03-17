@@ -5,6 +5,7 @@ import (
 	"gema/server/services"
 	"gema/server/views"
 	"github.com/kataras/iris"
+	"os"
 )
 
 type Dashboard struct {
@@ -14,6 +15,13 @@ type Dashboard struct {
 func (s *Dashboard) HQ(ctx iris.Context) {
 	if !s.requiresLogin(ctx) {
 		views.HQ(ctx)
+	}
+}
+
+func (s *Dashboard) Purge(ctx iris.Context) {
+	if !s.requiresLogin(ctx) {
+		os.RemoveAll("/cache")
+		ctx.Redirect("/")
 	}
 }
 

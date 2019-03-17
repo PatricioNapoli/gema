@@ -60,7 +60,6 @@ services:
     image: docker.elastic.co/beats/metricbeat:6.3.2
     volumes:
       - ./metricbeat.yml:/usr/share/metricbeat/metricbeat.yml
-      - ./metricbeat-entrypoint.sh:/usr/share/metricbeat/metricbeat-entrypoint.sh
     networks:
       - gema
     env_file:
@@ -82,7 +81,6 @@ services:
     volumes:
       - nginx_logs:/var/log/nginx
       - ./filebeat.yml:/usr/share/filebeat/filebeat.yml
-      - ./filebeat-entrypoint.sh:/usr/share/filebeat/filebeat-entrypoint.sh
       - /var/log/auth.log:/var/log/auth.log
       - /var/log/syslog:/var/log/syslog
     networks:

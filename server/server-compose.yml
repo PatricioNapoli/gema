@@ -29,6 +29,7 @@ services:
       - ./templates:/go/bin/templates
       - ./:/go/src/gema/server
       - nginx_static:/static
+      - nginx_cache:/cache
 
 networks:
   gema:
@@ -36,4 +37,6 @@ networks:
 
 volumes:
   nginx_static:
+    external: true
+  nginx_cache:
     external: true
