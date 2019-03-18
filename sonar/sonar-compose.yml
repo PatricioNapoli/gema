@@ -11,7 +11,7 @@ services:
       gema.port: 9000
       gema.subdomain: sonar
     environment:
-      sonar.jdbc.url: jdbc:postgresql://postgres/gema-sonar
+      sonar.jdbc.url: jdbc:postgresql://postgres/gema_sonar
     deploy:
       mode: replicated
       replicas: 1
