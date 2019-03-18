@@ -61,7 +61,7 @@ logging:
 
 Login to pgadmin and run the SQL in `databases.sql`
 
-SSH to sentry and run `./entrypoint.sh upgrade`
+SSH to sentry and run `sentry upgrade` and `sentry config generate-secret-key`
 
 Login to cloud and run migration from admin.
 
@@ -154,4 +154,3 @@ Setup for CI:
 * Performance Test
 * Project badges
 
-These tests should be performed through CI in Host machine container (git pull from container?), so as to reuse it in every repo.
