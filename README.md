@@ -117,11 +117,12 @@ sudo chown -R 2000:2000 ./chat/volumes/app/mattermost/
 * LogSkip internal pages with yml setting
 * Use Hazelcast for PGSQL and Redis cache
 * Add specific versioning for every service to prevent automatic upgrades.
-* Use internal docker registry?
+* Use internal docker registry in CI/CD
 * Support service route config modification on the fly. Maybe use JSON (like consul) when config becomes too complex.
 * Add Elastic Curator.
 * Filebeat for PGSQL and Redis logs.
 * Speed up ElasticSearch with Redis?
+* Add docker login and docker push to deploy.sh scripts.
 
 
 * Code Documentation, Wiki.js vs BookStack

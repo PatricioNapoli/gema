@@ -10,7 +10,10 @@ services:
       gema.subdomain: sentry
     env_file:
       - ../.env
-      - sentry.env
+    environment:
+      SENTRY_MEMCACHED_HOST: memcached
+      SENTRY_REDIS_HOST: redis
+      SENTRY_POSTGRES_HOST: postgres
     deploy:
       mode: replicated
       replicas: 1
@@ -31,7 +34,10 @@ services:
     command: ["run", "cron"]
     env_file:
       - ../.env
-      - sentry.env
+    environment:
+      SENTRY_MEMCACHED_HOST: memcached
+      SENTRY_REDIS_HOST: redis
+      SENTRY_POSTGRES_HOST: postgres
     deploy:
       mode: replicated
       replicas: 1
@@ -50,28 +56,14 @@ services:
     command: ["run", "worker"]
     env_file:
       - ../.env
-      - sentry.env
+    environment:
+      SENTRY_MEMCACHED_HOST: memcached
+      SENTRY_REDIS_HOST: redis
+      SENTRY_POSTGRES_HOST: postgres
     deploy:
       mode: global
     networks:
       - gema
-
-  sentry-redis:
-    image: redis:alpine
-    deploy:
-      mode: replicated
-      replicas: 1
-      restart_policy:
-        condition: on-failure
-        delay: 5s
-        max_attempts: 3
-        window: 120s
-      placement:
-        constraints: [node.labels.category == main]
-    networks:
-      - gema
-    volumes:
-      - redis_data:/data
 
 networks:
   gema:

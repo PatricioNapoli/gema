@@ -1,0 +1,43 @@
+version: "3.7"
+
+services:
+  sonar:
+    image: sonarqube:7.6-community
+    env_file:
+      - ../.env
+    labels:
+      gema.service: sonar
+      gema.auth: 1
+      gema.port: 9000
+      gema.subdomain: sonar
+    environment:
+      sonar.jdbc.url: jdbc:postgresql://postgres/gema-sonar
+    deploy:
+      mode: replicated
+      replicas: 1
+      restart_policy:
+        condition: on-failure
+        delay: 5s
+        max_attempts: 3
+        window: 120s
+      placement:
+        constraints: [node.labels.category == main]
+    networks:
+      - gema
+    ports:
+      - "9005:9000"
+    volumes:
+      - conf:/opt/sonarqube/conf
+      - data:/opt/sonarqube/data
+      - logs:/opt/sonarqube/logs
+      - extensions:/opt/sonarqube/extensions
+
+networks:
+  gema:
+    external: true
+
+volumes:
+  conf:
+  data:
+  logs:
+  extensions:

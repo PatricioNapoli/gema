@@ -72,27 +72,9 @@ services:
       - ../certs:/certs
       - ../auth:/auth
 
-  registry-redis:
-    image: redis:alpine
-    deploy:
-      mode: replicated
-      replicas: 1
-      restart_policy:
-        condition: on-failure
-        delay: 5s
-        max_attempts: 3
-        window: 120s
-      placement:
-        constraints: [node.labels.category == main]
-    networks:
-      - gema
-    volumes:
-      - redis_data:/data
-
 volumes:
   portainer_data:
   registry_data:
-  redis_data:
 
 networks:
   gema:

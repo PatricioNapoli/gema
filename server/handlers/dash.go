@@ -1,6 +1,7 @@
 package handlers
 
 import (
+	"errors"
 	"fmt"
 	"gema/server/services"
 	"gema/server/views"
@@ -14,6 +15,7 @@ type Dashboard struct {
 
 func (s *Dashboard) HQ(ctx iris.Context) {
 	if !s.requiresLogin(ctx) {
+		panic(errors.New("Test Panic"))
 		views.HQ(ctx)
 	}
 }
