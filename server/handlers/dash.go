@@ -2,6 +2,8 @@ package handlers
 
 import (
 	"fmt"
+	"gema/server/models"
+	"gema/server/security"
 	"gema/server/services"
 	"gema/server/views"
 	"github.com/kataras/iris"
@@ -21,6 +23,14 @@ func (s *Dashboard) HQ(ctx iris.Context) {
 func (s *Dashboard) Purge(ctx iris.Context) {
 	if !s.requiresLogin(ctx) {
 		os.RemoveAll("/cache")
+		ctx.Redirect("/")
+	}
+}
+
+func (s *Dashboard) Token(ctx iris.Context) {
+	if !s.requiresLogin(ctx) {
+		token := &models.Token{TokenHash:security.GetHash(ctx.PostValue("token"))}
+		token.InsertToken(s.Services.Database.SQL)
 		ctx.Redirect("/")
 	}
 }

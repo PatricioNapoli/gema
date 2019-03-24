@@ -31,10 +31,9 @@ Using the following environment:
 * cAdvisor
 
 ## Generating a self signed certificate.
-```
-sudo openssl req -x509 -nodes -days 365 -newkey rsa:2048 -keyout ./certs/domain.key -out ./certs/domain.crt` 
-sudo openssl dhparam -out ./certs/dhparam.pem 2048
-```
+
+`openssl req -config certs/localhost.conf -new -x509 -sha256 -newkey rsa:2048 -nodes -keyout certs/privkey.pem -days 365 -out certs/fullchain.pem`
+`sudo openssl dhparam -out ./certs/dhparam.pem 2048`
 
 ## Auth for Registry
 `auth/htpasswd`  
@@ -61,13 +60,26 @@ logging:
 
 Login to pgadmin and run the SQL in `databases.sql`
 
-SSH to sentry and run `sentry upgrade` and `sentry config generate-secret-key`
+`docker run -it --rm -e SENTRY_SECRET_KEY='<KEY>' --network="gema" -e SENTRY_REDIS_HOST=redis -e SENTRY_POSTGRES_HOST=postgres -e SENTRY_DB_PASSWORD=<PASS> -e SENTRY_DB_NAME=gema_sentry -e SENTRY_DB_USER=gema sentry upgrade`
 
 Login to cloud and run migration from admin.
 
-ID for Grafana dashboard: 1860. 
+ID for Grafana dashboard: 1860.
 
 GEMA server and agent need docker build.
+
+## Running SonarCLI.
+
+Download SonarCLI:
+https://binaries.sonarsource.com/Distribution/sonar-scanner-cli/sonar-scanner-cli-3.3.0.1492-linux.zip
+
+Download KeyStore or..:
+
+Import Certificate to keystore:
+`keytool -import -trustcacerts -keystore keystore -noprompt -alias hq.localhost -file fullchain.pem`
+
+Export java opts:
+`export SONAR_SCANNER_OPTS="-Djavax.net.ssl.trustStore=/path/to/keystore -Djavax.net.ssl.trustStorePassword=<PASS>"`
 
 ## Localhost resolution
 Use DNSMASQ for wildcard localhost subdomain resolution, like *.localhost.
@@ -123,7 +135,8 @@ sudo chown -R 2000:2000 ./chat/volumes/app/mattermost/
 * Filebeat for PGSQL and Redis logs.
 * Speed up ElasticSearch with Redis?
 * Add docker login and docker push to deploy.sh scripts.
-
+* Move away from Iris/Clone it.
+* Create GO Gema Core
 
 * Code Documentation, Wiki.js vs BookStack
 * Unit test GEMA

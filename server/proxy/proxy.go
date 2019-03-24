@@ -3,6 +3,8 @@ package proxy
 import (
 	"bytes"
 	"fmt"
+	"gema/server/models"
+	"gema/server/security"
 	"gema/server/utils"
 	"go.elastic.co/apm"
 	"io/ioutil"
@@ -101,6 +103,7 @@ func (s *Proxy) proxy(ctx iris.Context) {
 
 		target, _ := url.Parse("http://localhost:81/")
 		proxy := NewHTTPProxy(target, ctx.Host(), ctx.GetHeader("X-Real-IP"))
+		proxy.ModifyResponse = proxyInterception
 		proxy.ServeHTTP(ctx.ResponseWriter(), ctx.Request())
 		return
 	}
@@ -119,7 +122,22 @@ func (s *Proxy) proxy(ctx iris.Context) {
 		defer tx.End()
 	}
 
-	if serv.Auth == "0" || session.GetBooleanDefault("authenticated", false)  {
+	bearerAuth := false
+	if serv.Auth == "1" {
+		authHeader := ctx.GetHeader("Authorization")
+
+		if authHeader == "" {
+			authHeader = ctx.GetHeader("Proxy-Authorization")
+
+			if authHeader != "" {
+				authHeader = strings.Replace(authHeader, "Bearer ", "", 1)
+				token := &models.Token{TokenHash:security.GetHash(authHeader)}
+				bearerAuth = token.IsTokenValid(s.Services.Database.SQL)
+			}
+		}
+	}
+
+	if serv.Auth == "0" || session.GetBooleanDefault("authenticated", false) || bearerAuth  {
 		port := ":80"
 		if serv.Port != "" {
 			port = fmt.Sprintf(":%s", serv.Port)
@@ -148,6 +166,9 @@ func (s *Proxy) proxy(ctx iris.Context) {
 		return
 	}
 
+	ctx.StatusCode(407)
+	ctx.Header("Proxy-Authenticate", "Bearer realm=\"Geminis Architecture\"")
+	ctx.Header("WWW-Authenticate", "Bearer realm=\"Geminis Architecture\"")
 	ctx.Redirect(fmt.Sprintf("https://%s/?next=%s", os.Getenv("HQ_DOMAIN"), ctx.Host()))
 }
 
@@ -159,7 +180,6 @@ func proxyInterception(resp *http.Response) (err error) {
 	}
 
 	contentType := resp.Header.Get("Content-Type")
-
 	if strings.Contains(contentType, "json") || strings.Contains(contentType, "html") {
 		resp.Header.Set("Cache-Control", "no-cache, no-store")
 	}

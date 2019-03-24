@@ -184,10 +184,8 @@ func (w *WebsocketProxy) ServeHTTP(rw http.ResponseWriter, req *http.Request) {
 			msgType, msg, err := src.ReadMessage()
 			if err != nil {
 				m := websocket.FormatCloseMessage(websocket.CloseNormalClosure, fmt.Sprintf("%v", err))
-				if e, ok := err.(*websocket.CloseError); ok {
-					if e.Code != websocket.CloseNoStatusReceived {
-						m = websocket.FormatCloseMessage(e.Code, e.Text)
-					}
+				if e, ok := err.(*websocket.CloseError); ok && e.Code != websocket.CloseNoStatusReceived {
+					m = websocket.FormatCloseMessage(e.Code, e.Text)
 				}
 				errc <- err
 				dst.WriteMessage(websocket.CloseMessage, m)

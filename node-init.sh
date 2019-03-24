@@ -15,3 +15,10 @@ echo 'vm.max_map_count=262144' | sudo tee --append /etc/sysctl.conf
 
 # docker swarm init
 # docker node update --label-add category=main $HOSTNAME
+
+# Swap
+dd if=/dev/zero of=/swapfile count=8192 bs=1M
+chmod 600 /swapfile
+mkswap /swapfile
+swapon /swapfile
+echo "/swapfile   none    swap    sw    0   0" >> /etc/fstab

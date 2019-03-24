@@ -21,7 +21,9 @@ func New(sql *pg.DB) *Database {
 }
 
 func (s *Database) Dispose() {
-	s.SQL.Close()
+	if err := s.SQL.Close(); err != nil {
+		utils.Handle(err)
+	}
 }
 
 func (s *Database) IsFirstUser() bool {
@@ -40,9 +42,13 @@ func (s *Database) loadInitialData() {
 	groups := []string{"master", "dev", "client"}
 
 	for _, group := range groups {
-		s.SQL.Model(&models.Group{
+		_, err := s.SQL.Model(&models.Group{
 			Name: group,
 		}).Insert()
+
+		if err != nil {
+			utils.Handle(err)
+		}
 	}
 }
 
@@ -51,6 +57,7 @@ func (s *Database) Migrate() bool {
 		(*models.User)(nil),
 		(*models.Group)(nil),
 		(*models.Membership)(nil),
+		(*models.Token)(nil),
 	}
 
 	for _, model := range tables {

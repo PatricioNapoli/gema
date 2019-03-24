@@ -3,5 +3,5 @@
 sonar-scanner \
   -Dsonar.projectKey=gema \
   -Dsonar.sources=. \
-  -Dsonar.host.url=http://localhost:9005 \
-  -Dsonar.login=$SONAR_KEY
+  -Dsonar.host.url=http://sonar.hq.localhost \
+  -Dsonar.login=$1 \

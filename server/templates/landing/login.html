@@ -1,14 +1,14 @@
 <form action="/login{{ .next }}" method="post">
 {{ if .Invalid }}
-    <i class="fas fa-exclamation" style="color:orangered; margin-right: 20px;"></i> Incorrect user or password
+    <em class="fas fa-exclamation" style="color:orangered; margin-right: 20px;"></em> Incorrect user or password
 {{ end }}
     <div class="login-input-box">
-        <i class="fas fa-envelope" style="color:white; margin-right: 20px;"></i>
+        <em class="fas fa-envelope" style="color:white; margin-right: 20px;"></em>
         <input title="Email" type="email" id="email" name="email" autofocus>
     </div>
     <div class="login-input-box">
-        <i class="fas fa-lock" style="color:white; margin-right: 20px"></i>
+        <em class="fas fa-lock" style="color:white; margin-right: 20px"></em>
         <input title="Password" type="password" id="password" name="password">
     </div>
-    <button type="submit" class="btn btn-default btn-login"><i class="fas fa-share-square" style="color:white"></i></button>
+    <button type="submit" class="btn btn-default btn-login"><em class="fas fa-share-square" style="color:white"></em></button>
 </form>

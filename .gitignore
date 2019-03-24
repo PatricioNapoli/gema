@@ -3,3 +3,4 @@ sonar/.env
 auth/htpasswd
 chat/volumes
 certs/*.pem
+certs/keystore
