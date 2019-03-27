@@ -122,22 +122,18 @@ func (s *Proxy) proxy(ctx iris.Context) {
 		defer tx.End()
 	}
 
-	bearerAuth := false
+	tokenAuth := false
 	if serv.Auth == "1" {
 		authHeader := ctx.GetHeader("Authorization")
 
-		if authHeader == "" {
-			authHeader = ctx.GetHeader("Proxy-Authorization")
-
-			if authHeader != "" {
-				authHeader = strings.Replace(authHeader, "Bearer ", "", 1)
-				token := &models.Token{TokenHash:security.GetHash(authHeader)}
-				bearerAuth = token.IsTokenValid(s.Services.Database.SQL)
-			}
+		if authHeader != "" {
+			authHeader = strings.Replace(authHeader, "Basic ", "", 1)
+			token := &models.Token{TokenHash:security.GetHash(authHeader)}
+			tokenAuth = token.IsTokenValid(s.Services.Database.SQL)
 		}
 	}
 
-	if serv.Auth == "0" || session.GetBooleanDefault("authenticated", false) || bearerAuth  {
+	if serv.Auth == "0" || session.GetBooleanDefault("authenticated", false) || tokenAuth  {
 		port := ":80"
 		if serv.Port != "" {
 			port = fmt.Sprintf(":%s", serv.Port)
@@ -166,9 +162,6 @@ func (s *Proxy) proxy(ctx iris.Context) {
 		return
 	}
 
-	ctx.StatusCode(407)
-	ctx.Header("Proxy-Authenticate", "Bearer realm=\"Geminis Architecture\"")
-	ctx.Header("WWW-Authenticate", "Bearer realm=\"Geminis Architecture\"")
 	ctx.Redirect(fmt.Sprintf("https://%s/?next=%s", os.Getenv("HQ_DOMAIN"), ctx.Host()))
 }
 

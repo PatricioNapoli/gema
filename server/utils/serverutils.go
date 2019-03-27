@@ -9,7 +9,7 @@ import (
 	"github.com/kataras/iris/middleware/logger"
 )
 
-var StaticFilesRegex = regexp.MustCompile(`.+\..{2,5}.*$`)
+var StaticFilesRegex = regexp.MustCompile(`.+\.(css|js|png|jpg|jpeg|gif|ico|woff|otf|ttf|eot|svg|txt|pdf).*$`)
 
 func RegisterRecovery(app *iris.Application) {
 	app.Logger().Info("Setting up Raven recovery handler.")

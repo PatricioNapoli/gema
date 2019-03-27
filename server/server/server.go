@@ -19,7 +19,6 @@ func New(app *iris.Application, services *services.Services) *Server {
 	app.Logger().Info("Setting up GEMA server.")
 
 	utils.RegisterRecovery(app)
-	utils.RegisterLogger(app)
 	utils.RegisterViews(app)
 	utils.RegisterErrorHandlers(app)
 

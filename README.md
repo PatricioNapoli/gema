@@ -117,7 +117,6 @@ sudo chown -R 2000:2000 ./chat/volumes/app/mattermost/
 * Internal proxy auth, create dashboard for creating users, groups. These users work for the HQ and the internal services, limit access to kibana. In dash show service configs, allow for purge or edit.
 * Dashboard with machine learning analytics.
 * Dashboard for Service Redeployments (important), should be able to git pull, would be a release manager, you can even choose image version to deploy and see current version.
-* Nginx cache purge in dashboard
 * Cluster redis, postgres, prometheus and elasticsearch.
 * Support replication for better performance of some services: ElasticSearch, Prometheus, Redis, PGSQL, GEMA Server
 * Node communication/synchronization can be achieved through DSM solution using Redis as a message broker, like events.
