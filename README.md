@@ -136,6 +136,7 @@ sudo chown -R 2000:2000 ./chat/volumes/app/mattermost/
 * Add docker login and docker push to deploy.sh scripts.
 * Move away from Iris/Clone it.
 * Create GO Gema Core
+* Move away from Elastic APM? Use exporters for Prometheus
 
 * Code Documentation, Wiki.js vs BookStack
 * Unit test GEMA
@@ -143,6 +144,7 @@ sudo chown -R 2000:2000 ./chat/volumes/app/mattermost/
 * Define /health for services, (HEALTHCHECK dockerfile) GEMA Dashboard should test those for health.
 * Define logstash log pattern for all services in GEMA for parsing.
 * Use wikis for documentation.
+* Consider changing architecture to Schema-less because of db migration hassle.
 
 
 * Close logstash UDP port
