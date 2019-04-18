@@ -8,7 +8,7 @@ particlesJS("particles", {
             }
         },
         "color": {
-            "value": "#ffffff"
+            "value": "#FF69B7"
         },
         "shape": {
             "type": "circle",
@@ -21,12 +21,12 @@ particlesJS("particles", {
             }
         },
         "opacity": {
-            "value": 0.48927153781200905,
+            "value": 0.8,
             "random": false,
             "anim": {
                 "enable": true,
                 "speed": 0.2,
-                "opacity_min": 0,
+                "opacity_min": 0.4,
                 "sync": false
             }
         },
@@ -41,15 +41,15 @@ particlesJS("particles", {
             }
         },
         "line_linked": {
-            "enable": false,
-            "distance": 150,
+            "enable": true,
+            "distance": 100,
             "color": "#ffffff",
-            "opacity": 0.4,
-            "width": 1
+            "opacity": 0.1,
+            "width": 0.5
         },
         "move": {
             "enable": true,
-            "speed": 0.2,
+            "speed": 3,
             "direction": "none",
             "random": true,
             "straight": false,
@@ -113,8 +113,19 @@ function makeColor(min, max) {
     return "rgba(" + rand(min, max) + "," + rand(min, max) + "," + rand(min, max) + ",1)";
 }
 
-let color1 = makeColor(65, 85);
-let color2 = makeColor(45, 65);
-let color3 = makeColor(20, 45);
+function getColors() {
+    return {
+        color1: makeColor(65, 85),
+        color2: makeColor(45, 65),
+        color3: makeColor(20, 45),
+        color4: makeColor(10, 20),
+        color5: makeColor(0, 10)
+    };
+}
 
-document.getElementsByTagName("body")[0].style.background = "linear-gradient(0deg, " + color1 + " 0%, " + color2 + " 25%, " + color3 + " 50%, rgba(0,0,20,1) 75%, rgba(0,0,0,1) 100%)";
+function getGradient() {
+    let colors = getColors();
+    return "linear-gradient(0deg, " + colors.color1 + " 0%, " + colors.color2 + " 25%, " + colors.color3 + " 50%, " + colors.color4 + " 75%, " + colors.color5 + " 100%)";
+}
+
+document.getElementsByTagName("body")[0].style.background =  getGradient();
