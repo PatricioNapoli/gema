@@ -55,7 +55,7 @@ For sending container logs to kibana:
 logging:
   driver: gelf
   options:
-    gelf-address: udp://localhost:12201
+    gelf-address: udp://127.0.0.1:12201
 ```
 
 Login to pgadmin and run the SQL in `databases.sql`
