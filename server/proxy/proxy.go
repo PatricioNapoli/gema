@@ -45,7 +45,6 @@ func New(app *iris.Application, services *services.Services) *Proxy {
 	app.Logger().Info("Setting up GEMA reverse proxy.")
 
 	utils.RegisterRecovery(app)
-	utils.RegisterLogger(app)
 	utils.RegisterViews(app)
 	utils.RegisterErrorHandlers(app)
 

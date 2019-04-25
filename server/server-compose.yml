@@ -23,6 +23,10 @@ services:
       interval: 5s
       timeout: 10s
       retries: 3
+    logging:
+      driver: gelf
+      options:
+        gelf-address: udp://localhost:12201
     networks:
         - gema
     volumes:      
