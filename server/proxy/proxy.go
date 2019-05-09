@@ -161,6 +161,7 @@ func (s *Proxy) proxy(ctx iris.Context) {
 		return
 	}
 
+	ctx.Header("Cache-Control", "no-cache, no-store")
 	ctx.Redirect(fmt.Sprintf("https://%s/?next=%s", os.Getenv("HQ_DOMAIN"), ctx.Host()))
 }
 
