@@ -38,7 +38,7 @@ func (s *Handlers) LoginPost(ctx iris.Context) {
 		return
 	}
 
-	login := security.ComparePasswords(user.Hash, password)
+	login := security.VerifyPassword(user.Hash, password)
 
 	if login {
 		ctx.Application().Logger().Infof("%s logged in.", email)

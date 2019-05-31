@@ -13,8 +13,8 @@ func GetHash(password string) string {
 	return string(hash)
 }
 
-// Compares the password with its hash, returns true if equal, false otherwise.
-func ComparePasswords(hash string, password string) bool {
+// Verifies the password with its hash, returns true if equal, false otherwise.
+func VerifyPassword(hash string, password string) bool {
 	res := bcrypt.CompareHashAndPassword([]byte(hash), []byte(password))
 	return res == nil
 }

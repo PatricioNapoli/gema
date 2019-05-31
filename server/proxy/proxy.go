@@ -4,7 +4,7 @@ import (
 	"bytes"
 	"fmt"
 	"gema/server/models"
-	"gema/server/security"
+	"gema/server/services"
 	"gema/server/utils"
 	"go.elastic.co/apm"
 	"io/ioutil"
@@ -13,8 +13,6 @@ import (
 	"os"
 	"strconv"
 	"strings"
-
-	"gema/server/services"
 
 	"github.com/kataras/iris"
 )
@@ -127,8 +125,9 @@ func (s *Proxy) proxy(ctx iris.Context) {
 
 		if authHeader != "" {
 			authHeader = strings.Replace(authHeader, "Basic ", "", 1)
-			token := &models.Token{TokenHash:security.GetHash(authHeader)}
-			tokenAuth = token.IsTokenValid(s.Services.Database.SQL)
+			splitAuth := strings.Split(authHeader, " ")
+			token := &models.Token{User: splitAuth[0]}
+			tokenAuth = token.VerifyUserPassword(s.Services.Database.SQL, splitAuth[1])
 		}
 	}
 

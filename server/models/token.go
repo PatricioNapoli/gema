@@ -1,6 +1,7 @@
 package models
 
 import (
+	"gema/server/security"
 	"gema/server/utils"
 	"github.com/go-pg/pg"
 )
@@ -10,6 +11,7 @@ type Token struct {
 
 	BaseModel
 
+	User string
 	TokenHash string
 }
 
@@ -24,12 +26,12 @@ func (t *Token) InsertToken(db *pg.DB) int64 {
 	return uid
 }
 
-func (t* Token) IsTokenValid(db *pg.DB) bool {
-	err := db.Model(t).Where("token_hash = ?", t.TokenHash).Select()
+func (t* Token) VerifyUserPassword(db *pg.DB, password string) bool {
+	err := db.Model(t).Select()
 
 	if err == pg.ErrNoRows {
 		return false
 	}
 
-	return true
+	return security.VerifyPassword(t.TokenHash, password)
 }

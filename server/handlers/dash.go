@@ -29,7 +29,7 @@ func (s *Dashboard) Purge(ctx iris.Context) {
 
 func (s *Dashboard) Token(ctx iris.Context) {
 	if !s.requiresLogin(ctx) {
-		token := &models.Token{TokenHash:security.GetHash(ctx.PostValue("token"))}
+		token := &models.Token{User:ctx.PostValue("user"), TokenHash:security.GetHash(ctx.PostValue("token"))}
 		token.InsertToken(s.Services.Database.SQL)
 		ctx.Redirect("/")
 	}
