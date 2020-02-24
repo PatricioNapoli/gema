@@ -33,9 +33,27 @@ services:
     networks:
       - gema
 
+  influx:
+    image: influxdb:1.7.8-alpine
+    deploy:
+      mode: replicated
+      replicas: 1
+      restart_policy:
+        condition: on-failure
+        delay: 5s
+        max_attempts: 3
+        window: 120s
+      placement:
+        constraints: [node.labels.category == main]
+    networks:
+      - gema
+    volumes:
+      - influxdb_data:/var/lib/influxdb
+
 networks:
   gema:
     external: true
 
 volumes:
   data:
+  influxdb_data:
