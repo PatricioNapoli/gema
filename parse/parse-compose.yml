@@ -50,26 +50,26 @@ services:
   #   networks:
   #     - gema
 
-mongo:
-  image: mongo:4.2.6
-  deploy:
-    mode: replicated
-    replicas: 1
-    restart_policy:
-      condition: on-failure
-      delay: 5s
-      max_attempts: 3
-      window: 120s
-    placement:
-      constraints: [node.labels.category == main]
-  environment:
-      MONGO_INITDB_ROOT_USERNAME: gema
-      MONGO_INITDB_ROOT_PASSWORD: gema
-      MONGO_INITDB_DATABASE: geminis
-  networks:
-    - gema
-  volumes:
-    - mongodb:/data/db
+  mongo:
+    image: mongo:4.2.6
+    deploy:
+      mode: replicated
+      replicas: 1
+      restart_policy:
+        condition: on-failure
+        delay: 5s
+        max_attempts: 3
+        window: 120s
+      placement:
+        constraints: [node.labels.category == main]
+    environment:
+        MONGO_INITDB_ROOT_USERNAME: gema
+        MONGO_INITDB_ROOT_PASSWORD: gema
+        MONGO_INITDB_DATABASE: geminis
+    networks:
+      - gema
+    volumes:
+      - mongodb:/data/db
 
 networks:
   gema:
