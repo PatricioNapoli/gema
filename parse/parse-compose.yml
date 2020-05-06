@@ -1,0 +1,82 @@
+version: "3.7"
+
+services:
+  parse:
+    image: parse-server:4.2.0
+    deploy:
+      mode: replicated
+      replicas: 1
+      restart_policy:
+        condition: on-failure
+        delay: 5s
+        max_attempts: 3
+        window: 120s
+      placement:
+        constraints: [node.labels.category == main]
+    env_file:
+      - ../.env
+    environment:
+        PARSE_SERVER_APPLICATION_ID: geminis
+        PARSE_SERVER_DATABASE_URI: mongodb://gema:gema@mongo/geminis
+        PARSE_SERVER_URL: https://parse.geminis.dev
+    labels:
+        gema.service: parse
+        gema.auth: 0
+        gema.port: 1337
+        gema.subdomain: parse
+    networks:
+      - gema
+    volumes:
+      - cloud-code:/parse-server/cloud
+      - config:/parse-server/config
+
+  # parse-dash:
+  #   image: memcached:alpine
+  #   deploy:
+  #     mode: replicated
+  #     replicas: 1
+  #     restart_policy:
+  #       condition: on-failure
+  #       delay: 5s
+  #       max_attempts: 3
+  #       window: 120s
+  #     placement:
+  #       constraints: [node.labels.category == main]
+  #   labels:
+  #       gema.service: parse-dash
+  #       gema.auth: 0
+  #       gema.port: 8080
+  #       gema.subdomain: parse-dash
+  #   networks:
+  #     - gema
+
+mongo:
+  image: mongo:4.2.6
+  deploy:
+    mode: replicated
+    replicas: 1
+    restart_policy:
+      condition: on-failure
+      delay: 5s
+      max_attempts: 3
+      window: 120s
+    placement:
+      constraints: [node.labels.category == main]
+  environment:
+      MONGO_INITDB_ROOT_USERNAME: gema
+      MONGO_INITDB_ROOT_PASSWORD: gema
+      MONGO_INITDB_DATABASE: geminis
+  networks:
+    - gema
+  volumes:
+    - mongodb:/data/db
+
+networks:
+  gema:
+    external: true
+
+volumes:
+  mongodb:
+  cloud-code:
+  config:
+
