@@ -87,7 +87,7 @@ type service struct {
 	Domain      string `json:"gema.domain"`
 	SubDomain   string `json:"gema.subdomain"`
 	Path        string `json:"gema.path"`
-	CORS        bool   `json:"gema.cors"`
+	CORS        string `json:"gema.cors"`
 }
 
 func (s *Proxy) proxy(ctx iris.Context) {
@@ -147,7 +147,7 @@ func (s *Proxy) proxy(ctx iris.Context) {
 
 		target, _ := url.Parse(route)
 
-		if serv.CORS {
+		if serv.CORS == "yes" {
 			ctx.Request().Header.Set("Access-Control-Allow-Origin", "*")
 			ctx.Request().Header.Set("Access-Control-Allow-Headers", "*")
 			ctx.Request().Header.Set("Access-Control-Allow-Methods", "*")
