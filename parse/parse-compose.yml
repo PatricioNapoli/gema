@@ -25,6 +25,7 @@ services:
         gema.auth: 0
         gema.port: 1337
         gema.subdomain: parse
+        gema.cors: yes
     networks:
       - gema
     volumes:

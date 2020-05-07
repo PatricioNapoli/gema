@@ -146,6 +146,12 @@ func (s *Proxy) proxy(ctx iris.Context) {
 
 		target, _ := url.Parse(route)
 
+		if serv.CORS {
+			ctx.Request().Header.Set("Access-Control-Allow-Origin", "*")
+			ctx.Request().Header.Set("Access-Control-Allow-Headers", "*")
+			ctx.Request().Header.Set("Access-Control-Allow-Methods", "*")
+		}
+
 		// Handle WebSocket
 		if ctx.Request().Header.Get("Connection") == "upgrade" {
 			wsProxy := NewWebSocketProxy(target, ctx.Host(), ctx.GetHeader("X-Real-IP"))

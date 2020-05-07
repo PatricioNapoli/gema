@@ -20,6 +20,7 @@ type Attributes struct {
 	Domain      string `json:"gema.domain"`
 	SubDomain   string `json:"gema.subdomain"`
 	Path        string `json:"gema.path"`
+	CORS        bool   `json:"gema.cors"`
 }
 
 func DefaultEvent() *Event {
