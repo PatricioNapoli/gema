@@ -43,6 +43,8 @@ services:
         window: 120s
       placement:
         constraints: [node.labels.category == main]
+    env_file:
+      - ../.env
     environment:
       PARSE_DASHBOARD_SERVER_URL: https://parse.geminis.dev/parse
       PARSE_DASHBOARD_GRAPHQL_URL: https://parse.geminis.dev/graphql
