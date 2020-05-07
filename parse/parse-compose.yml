@@ -19,7 +19,7 @@ services:
         PARSE_SERVER_APPLICATION_ID: geminis
         PARSE_SERVER_DATABASE_URI: mongodb://gema:gema@mongo/geminis
         PARSE_SERVER_URL: https://parse.geminis.dev/parse
-        PARSE_SERVER_MOUNT_GRAPHQL: true
+        PARSE_SERVER_MOUNT_GRAPHQL: "true"
     labels:
         gema.service: parse
         gema.auth: 0
@@ -31,25 +31,29 @@ services:
       - cloud-code:/parse-server/cloud
       - config:/parse-server/config
 
-  # parse-dash:
-  #   image: memcached:alpine
-  #   deploy:
-  #     mode: replicated
-  #     replicas: 1
-  #     restart_policy:
-  #       condition: on-failure
-  #       delay: 5s
-  #       max_attempts: 3
-  #       window: 120s
-  #     placement:
-  #       constraints: [node.labels.category == main]
-  #   labels:
-  #       gema.service: parse-dash
-  #       gema.auth: 0
-  #       gema.port: 8080
-  #       gema.subdomain: parse-dash
-  #   networks:
-  #     - gema
+  parse-dash:
+    image: parseplatform/parse-dashboard:2.0.5
+    deploy:
+      mode: replicated
+      replicas: 1
+      restart_policy:
+        condition: on-failure
+        delay: 5s
+        max_attempts: 3
+        window: 120s
+      placement:
+        constraints: [node.labels.category == main]
+    environment:
+      PARSE_DASHBOARD_SERVER_URL: https://parse.geminis.dev/parse
+      PARSE_DASHBOARD_GRAPHQL_URL: https://parse.geminis.dev/graphql
+      PARSE_DASHBOARD_APP_ID: geminis
+    labels:
+        gema.service: parse-dash
+        gema.auth: 0
+        gema.port: 4040
+        gema.subdomain: parsed
+    networks:
+      - gema
 
   mongo:
     image: mongo:4.2.6
