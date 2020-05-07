@@ -49,6 +49,7 @@ services:
       PARSE_DASHBOARD_SERVER_URL: https://parse.geminis.dev/parse
       PARSE_DASHBOARD_GRAPHQL_URL: https://parse.geminis.dev/graphql
       PARSE_DASHBOARD_APP_ID: geminis
+      PARSE_DASHBOARD_USER_ID: gema
       PARSE_DASHBOARD_TRUST_PROXY: 1
     labels:
         gema.service: parse-dash
@@ -57,8 +58,6 @@ services:
         gema.subdomain: parsed
     networks:
       - gema
-    volumes:
-      - ./config.json:/src/Parse-Dashboard/parse-dashboard-config.json
 
   mongo:
     image: mongo:4.2.6
