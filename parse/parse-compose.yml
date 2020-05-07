@@ -58,7 +58,7 @@ services:
     networks:
       - gema
     volumes:
-      ./config.json:/src/Parse-Dashboard/parse-dashboard-config.json
+      - ./config.json:/src/Parse-Dashboard/parse-dashboard-config.json
 
   mongo:
     image: mongo:4.2.6
