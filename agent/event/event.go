@@ -36,7 +36,7 @@ func DefaultEvent() *Event {
 				Domain:      "",
 				SubDomain:   "",
 				Path:        "/",
-				CORS:		 false
+				CORS:		 false,
 			},
 		},
 	}
