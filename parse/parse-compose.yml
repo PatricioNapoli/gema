@@ -18,7 +18,7 @@ services:
     environment:
         PARSE_SERVER_APPLICATION_ID: geminis
         PARSE_SERVER_DATABASE_URI: mongodb://gema:gema@mongo/geminis
-        PARSE_SERVER_URL: https://parse.geminis.dev
+        PARSE_SERVER_URL: https://parse.geminis.dev/parse
     labels:
         gema.service: parse
         gema.auth: 0
