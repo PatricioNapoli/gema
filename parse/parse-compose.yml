@@ -2,7 +2,7 @@ version: "3.7"
 
 services:
   parse:
-    image: parse-server:4.2.0
+    image: parseplatform/parse-server:4.2.0
     deploy:
       mode: replicated
       replicas: 1
