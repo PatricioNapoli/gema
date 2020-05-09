@@ -8,7 +8,9 @@ VOLUME /go/bin/templates
 
 RUN apk add git
 
-RUN go get -v -u github.com/kataras/iris
+ENV GO111MODULE=on
+
+RUN go get -v -u github.com/kataras/iris/v12@latest
 RUN go get -v -u github.com/go-pg/pg
 RUN go get -v -u github.com/codegangsta/gin
 RUN go get -v -u golang.org/x/crypto/bcrypt

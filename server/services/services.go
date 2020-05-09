@@ -9,7 +9,6 @@ import (
 	"github.com/go-redis/redis"
 	"github.com/kataras/iris/sessions"
 	irisRedis "github.com/kataras/iris/sessions/sessiondb/redis"
-	"github.com/kataras/iris/sessions/sessiondb/redis/service"
 	"go.elastic.co/apm"
 )
 
