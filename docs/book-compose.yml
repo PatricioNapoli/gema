@@ -53,3 +53,7 @@ services:
 volumes:
     bs_data:
     db_data:
+
+networks:
+    gema:
+        external: true
