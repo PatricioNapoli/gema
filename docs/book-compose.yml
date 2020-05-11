@@ -1,0 +1,55 @@
+version: "3.7"
+
+services:
+  bookstack:
+    image: linuxserver/bookstack
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - DB_HOST=bookstack_db
+      - DB_USER=bookstack
+      - DB_PASS=bookstack
+      - DB_DATABASE=bookstack
+      - APP_URL=https://docs.geminis.dev
+    deploy:
+        mode: global
+        restart_policy:
+            condition: on-failure
+            delay: 5s
+            max_attempts: 3
+            window: 120s
+    labels:
+        gema.service: bookstack
+        gema.auth: 1
+        gema.port: 80
+        gema.subdomain: docs
+    networks:
+        - gema
+    volumes:
+      - bs_data:/config
+
+  bookstack_db:
+    image: linuxserver/mariadb
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=America/Argentina/Buenos_Aires
+      - MYSQL_ROOT_PASSWORD=bookstack
+      - MYSQL_DATABASE=bookstack
+      - MYSQL_USER=bookstack
+      - MYSQL_PASSWORD=bookstack
+    deploy:
+        mode: global
+        restart_policy:
+            condition: on-failure
+            delay: 5s
+            max_attempts: 3
+            window: 120s
+    networks:
+        - gema
+    volumes:
+      - db_data:/config
+
+volumes:
+    bs_data:
+    db_data:
