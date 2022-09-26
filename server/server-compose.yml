@@ -31,7 +31,7 @@ services:
         - gema
     volumes:      
       - ./templates:/go/bin/templates
-      - ./:/go/src/gema/server
+      - ./:/usr/local/go/src/gema/server
       - nginx_static:/static
       - nginx_cache:/cache
 

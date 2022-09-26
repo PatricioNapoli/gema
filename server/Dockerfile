@@ -1,16 +1,16 @@
 FROM golang:alpine
 EXPOSE 8080
-WORKDIR /go/src/gema/server
+WORKDIR /usr/local/go/src/gema/server
 
-VOLUME /go/src/gema/server
-VOLUME /go/bin/static
-VOLUME /go/bin/templates
+VOLUME /usr/local/go/src/gema/server
+VOLUME /usr/local/go/bin/static
+VOLUME /usr/local/go/bin/templates
 
-RUN apk add git
+RUN apk add git build-base
 
 ENV GO111MODULE=on
 
-RUN go get -v -u github.com/kataras/iris/v12@latest
+RUN go get -v -u github.com/kataras/iris@latest
 RUN go get -v -u github.com/go-pg/pg
 RUN go get -v -u github.com/codegangsta/gin
 RUN go get -v -u golang.org/x/crypto/bcrypt
@@ -21,7 +21,7 @@ RUN go get -v -u github.com/gorilla/websocket
 
 COPY . .
 
-COPY templates /go/bin/templates
+COPY templates /usr/local/go/bin/templates
 
-RUN go build -v -o /go/bin/gema-server main.go
+RUN go build -mod=mod -v -o /usr/local/go/bin/gema-server main.go
 ENTRYPOINT ["./entrypoint.sh"]

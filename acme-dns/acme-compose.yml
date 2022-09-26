@@ -9,15 +9,12 @@ services:
         gema.port: 80
         gema.subdomain: acme
     deploy:
-        mode: replicated
-        replicas: 1
-        restart_policy:
+      mode: global
+      restart_policy:
           condition: on-failure
           delay: 5s
           max_attempts: 3
           window: 120s
-        placement:
-          constraints: [node.labels.category == main]
     ports:
       - "53:53"
       - "53:53/udp"

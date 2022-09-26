@@ -75,10 +75,12 @@ func (h *Handler) HandleEvent(ev *Event) {
 
 	evService := ev.Actor.Attributes
 
-	j := string(utils.ToJSON(evService))
-
 	route := getRoute(evService)
 	key := fmt.Sprintf("service:%s", route)
+
+	evService.Domain = route
+
+	j := string(utils.ToJSON(evService))
 
 	err := h.Database.Set(key, j, 0).Err()
 	utils.Handle(err)
